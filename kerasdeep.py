@@ -35,7 +35,7 @@ trainS = ['./01/clusterstrain0_1.txt','./01/clusterstrainlabels0_1.txt']
 testS  = ['./01/clusterstest0_1.txt','./01/clusterstestlabels0_1.txt']
 
 #batchsizes = [5,10,15,20,25,40,50,70,100,150,200]
-batchsizes = [50,100]#,500,1000,10000]
+batchsizes = [500,1000]#,500,1000,10000]
 epochs = [1]#,2,5,10,20]
 
 clustercnn = Sequential()
@@ -129,17 +129,24 @@ for batchsize in batchsizes:
         TruePositives.append(TruePositive/trues)
         FalsePositives.append(FalsePositive/falses)
 
-        falsePositive = np.asarray(falsePositive,dtype=np.float32)
+        truePosivites.append(TruePositive)
+        falsePositive.append(FalsePositive)
 
         result = (epoch,batchsize,truePosivites,falsePositive)
         results.append(result);
 
-        plt.plot(FalsePositives,TruePositives)
-        plt.savefig("half_batch_%g_epoch_%g_trues.png"%(batchsize,epochs))
+    #falsePositive = np.asarray(falsePositive,dtype=np.float32)
 
-          #np.savetxt("half_batch_%g_epoch_%g_trues.out"%(batchsize,epochs),(TruePositives))
-          #np.savetxt("half_batch_%g_epoch_%g_falses.out"%(batchsize,epochs),(FalsePositives))
-          #np.savetxt("half_batch_%g_epoch_%g_thresh.out"%(batchsize,epochs),(thresholds))
+
+    plt.plot(FalsePositives,TruePositives)
+    plt.savefig("half_batch_%g_epoch_%g_trues.png"%(batchsize,epoch))
+
+    TruePositives = np.asarray(TruePositives,dtype=np.float32)
+    FalsePositives = np.asarray(FalsePositives,dtype=np.float32)
+
+    np.savetxt("half_batch_%g_epoch_%g_trues.out"%(batchsize,epoch),(TruePositives))
+    np.savetxt("half_batch_%g_epoch_%g_falses.out"%(batchsize,epoch),(FalsePositives))
+    np.savetxt("half_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
 
           #plt.savefig("trueFalse.png")
 
