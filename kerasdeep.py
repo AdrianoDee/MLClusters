@@ -35,8 +35,8 @@ trainS = ['./01/clusterstrain0_1.txt','./01/clusterstrainlabels0_1.txt']
 testS  = ['./01/clusterstest0_1.txt','./01/clusterstestlabels0_1.txt']
 
 #batchsizes = [5,10,15,20,25,40,50,70,100,150,200]
-batchsizes = [500,1000]#,500,1000,10000]
-epochs = [1]#,2,5,10,20]
+batchsizes = [250,500,1000,10000]#,500,1000,10000]
+epochs = [1,2,5,10,20]
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
