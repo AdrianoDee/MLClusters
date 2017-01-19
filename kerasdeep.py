@@ -1,6 +1,9 @@
 #import keras
 from __future__ import division
 
+import tensorflow as tf
+tf.python.control_flow_ops = tf
+
 import numpy as np
 import collections
 import kerutils as ku
