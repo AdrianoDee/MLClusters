@@ -31,12 +31,18 @@ pile = 2
 batchsize = 1000
 lDel = False
 
-trainS = ['./01/clusterstrain0_1.txt','./01/clusterstrainlabels0_1.txt']
-testS  = ['./01/clusterstest0_1.txt','./01/clusterstestlabels0_1.txt']
+# trainS = ['clusterstrain0_1.txt','clusterstrainlabels0_1.txt']
+# testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
 
-#batchsizes = [5,10,15,20,25,40,50,70,100,150,200]
-batchsizes = [250,500,1000,10000]#,500,1000,10000]
-epochs = [1,2,5,10,20]
+# trainS = ['dets_0_1_mods_176_144train.txt','dets_0_1_mods_176_144labelstrain.txt']
+# testS  = ['dets_0_1_mods_176_144test.txt','dets_0_1_mods_176_144labelstest.txt']
+
+trainS = ['dets_0_1_mods_192_176train.txt','dets_0_1_mods_192_176labelstrain.txt']
+testS  = ['dets_0_1_mods_192_176test.txt','dets_0_1_mods_192_176labelstest.txt']
+
+batchsizes = [25,70,100,150,200]
+#batchsizes = [250,500,1000,10000]#,500,1000,10000]
+epochs = [10,20]
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
@@ -95,7 +101,7 @@ for epoch in epochs:
         falsePositive = []
         values = []
 
-        thresholds = np.linspace(np.amin(predicted_target_score), 1.0, num=1000)
+        thresholds = np.linspace(np.amin(predicted_target_score), 1.0, num=10000)
 
         #print (predicted_target_score)
         #print (np.amin(predicted_target_score)*0.99999)
@@ -142,14 +148,14 @@ for epoch in epochs:
 
 
         plt.plot(FalsePositives,TruePositives)
-        plt.savefig("half_batch_%g_epoch_%g_trues.png"%(batchsize,epoch))
+        plt.savefig("mod_batch_%g_epoch_%g_trues.png"%(batchsize,epoch))
 
         TruePositives = np.asarray(TruePositives,dtype=np.float32)
         FalsePositives = np.asarray(FalsePositives,dtype=np.float32)
 
-        np.savetxt("half_batch_%g_epoch_%g_trues.out"%(batchsize,epoch),(TruePositives))
-        np.savetxt("half_batch_%g_epoch_%g_falses.out"%(batchsize,epoch),(FalsePositives))
-        np.savetxt("half_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
+        np.savetxt("mod_batch_%g_epoch_%g_trues.out"%(batchsize,epoch),(TruePositives))
+        np.savetxt("mod_batch_%g_epoch_%g_falses.out"%(batchsize,epoch),(FalsePositives))
+        np.savetxt("mod_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
 
               #plt.savefig("trueFalse.png")
 

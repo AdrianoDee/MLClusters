@@ -40,15 +40,15 @@ def data_clusterslabels(f,num_classes=2,lDelimiter=False):
 
     #Givin back a one dim vector of labels
     print ("Reading labels from  ",f.name)
-    
+
     if not lDelimiter:
-      
+
       labels = numpy.loadtxt(f,delimiter=' ',dtype = numpy.uint16)
- 
+
     if lDelimiter:
       l=f.read().replace('\n','')
       labels = numpy.array(list(l), dtype = numpy.uint16)
-      
+
     num_labels = labels.shape[0]
     print(num_labels, " clusters labels read ")
 
@@ -67,7 +67,7 @@ def base_read_data_sets(trainsets,testsets,
   TRAIN_LABELS  = trainsets[1]
   TEST_DATASET  = testsets[0]
   TEST_LABELS   = testsets[1]
-  
+
 
   train_file = os.path.join(train_dir, TRAIN_DATASET)
   train_labels_file = os.path.join(train_dir, TRAIN_LABELS)
@@ -81,11 +81,11 @@ def base_read_data_sets(trainsets,testsets,
   with open(train_file, 'rb') as f:
       train_clusters = data_clusters(f,cols,rows,stack)
 
-  with open(test_file, 'rb') as f:
-      test_clusters = data_clusters(f,cols,rows,stack)
-
   with open(test_labels_file, 'rb') as f:
       test_clusters_labels = data_clusterslabels(f,lDelimiter=l_delimiter)
+
+  with open(test_file, 'rb') as f:
+      test_clusters = data_clusters(f,cols,rows,stack)
 
   return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
 
@@ -106,3 +106,33 @@ def accuracy_measure(y_actual, y_hat):
       elif y_actual[i]==1 and y_actual[i]!=y_hat[i]:
           FalseNegative += 1
   return(TruePositive, FalsePositive, TrueNegative, FalseNegative)
+
+def doublets_read_data_sets(trainsets,testsets,
+                   dtype=dtypes.uint16,train_dir='./Hits/',
+                   reshape=True,cols=8,rows=8,stack=2):
+
+  TRAIN_DATASET = trainsets[0]
+  TRAIN_LABELS  = trainsets[1]
+  TEST_DATASET  = testsets[0]
+  TEST_LABELS   = testsets[1]
+
+
+  train_file = os.path.join(train_dir, TRAIN_DATASET)
+  train_labels_file = os.path.join(train_dir, TRAIN_LABELS)
+
+  test_file = os.path.join(train_dir, TEST_DATASET)
+  test_labels_file = os.path.join(train_dir, TEST_LABELS)
+
+  with open(train_labels_file, 'rb') as f:
+      train_clusters_labels = data_clusterslabels(f,lDelimiter=l_delimiter)
+
+  with open(train_file, 'rb') as f:
+      train_clusters = data_clusters(f,cols,rows,stack)
+
+  with open(test_file, 'rb') as f:
+      test_clusters = data_clusters(f,cols,rows,stack)
+
+  with open(test_labels_file, 'rb') as f:
+      test_clusters_labels = data_clusterslabels(f,lDelimiter=l_delimiter)
+
+  return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
