@@ -34,8 +34,8 @@ pile = 2
 batchsize = 1000
 lDel = False
 
-trainS = ['./01/clusterstrain0_1.txt','./01/clusterstrainlabels0_1.txt']
-testS  = ['./01/clusterstest0_1.txt','./01/clusterstestlabels0_1.txt']
+trainS = ['clusterstrain0_1.txt','clusterstrainlabels0_1.txt']
+testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
 
 #trainS = ['clusters0_1.txt','clusterslabels0_1.txt']
 #testS  = ['clusters0_1.txt','clusterslabels0_1.txt']
@@ -70,7 +70,7 @@ clustercnn.add(Dense(2, activation='softmax'))
 #clustercnn.add(Dense(2, activation='sigmoid'))
 #clustercnn.add(Dense(1, activation='softmax'))
 
-(X_train, y_train), (X_test, y_test) = ku.base_read_data_sets(trainsets=trainS,testsets=testS,cols=size,rows=size,stack=pile,l_delimiter=lDel)
+(X_train, y_train), (X_test, y_test) = ku.base_read_data_sets(trainsets=trainS,testsets=testS,train_dir='./datasets/doublets/01/',cols=size,rows=size,stack=pile,l_delimiter=lDel)
 clustercnn.compile(loss='binary_crossentropy',optimizer='sgd', metrics=['accuracy'])
 #early = EarlyStopping(monitor='val_loss', patience=0, verbose=0, mode='auto')
 
@@ -94,7 +94,7 @@ for batchsize in batchsizes:
         falses = (y_test_score == 0.0).sum();
         trues = (y_test_score == 1.0).sum();
 
-        print("-- Testing with dataset with %g false and %g true"%(falses,trues))
+        print(" \n -- Testing with dataset with %g false and %g true"%(falses,trues))
 
         predicted_target_score = predicted_target[:,1]
 
