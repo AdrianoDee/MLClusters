@@ -167,8 +167,8 @@ for batchsize in batchsizes:
         TruePositives = np.asarray(tpr,dtype=np.float32)
         FalsePositives = np.asarray(fpr,dtype=np.float32)
 
-        truesPath = trainS[0][:-4] + "mod_batch_" + batchsize + "epoch" + epoch + "_trues.out"
-        falsesPath = trainS[0][:-4] + "mod_batch_" + batchsize + "epoch" + epoch + "_falses.out"
+        truesPath = trainS[0][:-4] + "mod_batch_" + str(batchsize) + "epoch" + str(epoch) + "_trues.out"
+        falsesPath = trainS[0][:-4] + "mod_batch_" + str(batchsize) + "epoch" + str(epoch) + "_falses.out"
 
         np.savetxt(truesPath,(TruePositives))
         np.savetxt(falsesPath,(FalsePositives))
