@@ -15,7 +15,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import model_from_json, Sequential
 from keras.layers import Dense, Dropout, Activation, Convolution2D, Convolution3D, Flatten, MaxPooling2D, MaxPooling3D, Merge
 from keras.callbacks import History
-from sklearn import metrics,roc_curve
+from sklearn.metrics import roc_curve, auc
 import ROOT
 
 import matplotlib.pyplot as plt
