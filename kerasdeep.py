@@ -121,7 +121,7 @@ for epoch in epochs:
         FalsePositives = []
 
         fpr, tpr, _ = roc_curve(y_test_score, predicted_target_score)
-        print("Auto area ROC : %g",(auc(fpr, tpr)))
+        print("Auto area ROC : %g"%(auc(fpr, tpr)))
 
 
         # fpr, tpr, Thresholds = metrics.roc_curve(y_test_score, predicted_target_score, pos_label=2)
@@ -180,7 +180,7 @@ for epoch in epochs:
         np.savetxt("mod_batch_%g_epoch_%g_falses.out"%(batchsize,epoch),(FalsePositives))
         np.savetxt("mod_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
 
-        print("  - ROC Area  = %g "%(metrics.auc(FalsePositives,TruePositives)))
+        print("  - ROC Area  = %g "%(auc(FalsePositives,TruePositives)))
 
 
 
