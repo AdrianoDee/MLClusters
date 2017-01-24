@@ -15,7 +15,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import model_from_json, Sequential
 from keras.layers import Dense, Dropout, Activation, Convolution2D, Convolution3D, Flatten, MaxPooling2D, MaxPooling3D, Merge
 from keras.callbacks import History
-from sklearn import metrics
+from sklearn import metrics,roc_curve
 import ROOT
 
 import matplotlib.pyplot as plt
@@ -88,7 +88,7 @@ for epoch in epochs:
 
         # summarize history for accuracy
         predicted_target = clustercnn.predict(X_test)
-
+        loss_test = clustercnn.evaluate(X_test,predicted_target,batch_size=batchsize)
         #print(predicted_target.shape())
         #print(predicted_target)
         #print(y_test)
@@ -97,6 +97,9 @@ for epoch in epochs:
 
         falses = (y_test_score == 0.0).sum();
         trues = (y_test_score == 1.0).sum();
+
+        print(history.history.keys())
+        print(history.history.['acc'])
 
         print("-- Testing with dataset with %g false and %g true"%(falses,trues))
 
@@ -114,6 +117,10 @@ for epoch in epochs:
 
         TruePositives = []
         FalsePositives = []
+
+        fpr, tpr, _ = roc_curve(y_test_score, predicted_target_score)
+        print("Auto area ROC : %g",(roc_auc = auc(fpr, tpr)))
+
 
         # fpr, tpr, Thresholds = metrics.roc_curve(y_test_score, predicted_target_score, pos_label=2)
         #
@@ -172,6 +179,8 @@ for epoch in epochs:
         np.savetxt("mod_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
 
         print("  - ROC Area  = %g "%(metrics.auc(FalsePositives,TruePositives)))
+
+
 
               #plt.savefig("trueFalse.png")
 
