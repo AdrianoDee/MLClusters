@@ -17,6 +17,7 @@ from keras.layers import Dense, Dropout, Activation, Convolution2D, Convolution3
 from keras.callbacks import History
 from sklearn.metrics import roc_curve, auc
 import ROOT
+import pickle
 
 import matplotlib.pyplot as plt
 #from tensorflow.python.framework import dtypes
@@ -33,8 +34,8 @@ pile = 2
 batchsize = 1000
 lDel = False
 
-#trainS = ['clusterstrain0_1.txt','clusterstrainlabels0_1.txt']
-#testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
+trainS = ['./01/clusterstrain0_1.txt','./01/clusterstrainlabels0_1.txt']
+testS  = ['./01/clusterstest0_1.txt','./01/clusterstestlabels0_1.txt']
 
 #trainS = ['clusters0_1.txt','clusterslabels0_1.txt']
 #testS  = ['clusters0_1.txt','clusterslabels0_1.txt']
@@ -42,12 +43,13 @@ lDel = False
 # trainS = ['dets_0_1_mods_176_144train.txt','dets_0_1_mods_176_144labelstrain.txt']
 # testS  = ['dets_0_1_mods_176_144test.txt','dets_0_1_mods_176_144labelstest.txt']
 
-trainS = ['dets_0_1_mods_192_176train.txt','dets_0_1_mods_192_176labelstrain.txt']
-testS  = ['dets_0_1_mods_192_176test.txt','dets_0_1_mods_192_176labelstest.txt']
+#trainS = ['dets_0_1_mods_192_176train.txt','dets_0_1_mods_192_176labelstrain.txt']
+#testS  = ['dets_0_1_mods_192_176test.txt','dets_0_1_mods_192_176labelstest.txt']
 
-batchsizes = [100,20,50,70,100,150,200]
+batchsizes = [50]
 #batchsizes = [250,500,1000,10000]#,500,1000,10000]
-epochs = [1,10,20]
+epochs = [1,10,20,50,100,150]
+
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
@@ -74,19 +76,13 @@ clustercnn.compile(loss='binary_crossentropy',optimizer='sgd', metrics=['accurac
 
 results = []
 
-for epoch in epochs:
-    for batchsize in batchsizes:
+for batchsize in batchsizes:
+    for epoch in epochs:
         print("-- Training with %g (%g epochs)"%(batchsize,epoch))
         history = History()
         #early = ker.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=0, verbose=0, mode='auto')
-        history = clustercnn.fit(X_train, y_train,validation_data=(X_test, y_test), nb_epoch=epoch, batch_size=batchsize,shuffle=True,verbose=0)#,callbacks=[early])
+        history = clustercnn.fit(X_train, y_train,validation_split=0.33, nb_epoch=epoch, batch_size=batchsize,shuffle=True,verbose=0)#,callbacks=[early])
 
-        #%matplotlib inline
-        #show_losses([("mse",histo)],"Dense_test")
-
-        #print(history.history.keys())
-
-        # summarize history for accuracy
         predicted_target = clustercnn.predict(X_test)
         loss_test = clustercnn.evaluate(X_test,predicted_target,batch_size=batchsize)
         #print(predicted_target.shape())
@@ -98,11 +94,6 @@ for epoch in epochs:
         falses = (y_test_score == 0.0).sum();
         trues = (y_test_score == 1.0).sum();
 
-        print(history.history.keys())
-        print(history.history['acc'])
-        print(history.history['loss'])
-        print(history.history['val_loss'])
-
         print("-- Testing with dataset with %g false and %g true"%(falses,trues))
 
         predicted_target_score = predicted_target[:,1]
@@ -111,17 +102,17 @@ for epoch in epochs:
         falsePositive = []
         values = []
 
-        thresholds = np.linspace(np.amin(predicted_target_score), 1.0, num=10000)
+        #thresholds = np.linspace(np.amin(predicted_target_score), 1.0, num=10000)
 
         #print (predicted_target_score)
         #print (np.amin(predicted_target_score)*0.99999)
         #print (thresholds)
 
-        TruePositives = []
-        FalsePositives = []
+        # TruePositives = []
+        # FalsePositives = []
 
         fpr, tpr, _ = roc_curve(y_test_score, predicted_target_score)
-        print("Auto area ROC : %g"%(auc(fpr, tpr)))
+        print("  - ROC Area : %g"%(auc(fpr, tpr)))
 
 
         # fpr, tpr, Thresholds = metrics.roc_curve(y_test_score, predicted_target_score, pos_label=2)
@@ -137,50 +128,60 @@ for epoch in epochs:
         #print(falses)
 
 
-        for i in range(len(thresholds)):
-            low_values_indices_true = y_test_score >0.5
-            low_values_indices = predicted_target_score > thresholds[i]
-            #print(low_values_indices)
-            TruePositive = 0
-            FalsePositive = 0
-            TrueNegative = 0
-            FalseNegative = 0
-            #All = len(low_values_indices)
+        # for i in range(len(thresholds)):
+        #     low_values_indices_true = y_test_score >0.5
+        #     low_values_indices = predicted_target_score > thresholds[i]
+        #     #print(low_values_indices)
+        #     TruePositive = 0
+        #     FalsePositive = 0
+        #     TrueNegative = 0
+        #     FalseNegative = 0
+        #     #All = len(low_values_indices)
+        #
+        #     for j in range(len(low_values_indices)):
+        #         if(low_values_indices_true[j]==False and low_values_indices[j]==False):
+        #             TrueNegative+=1
+        #         #if(low_values_indices_true[j]==True and low_values_indices[j]==True):
+        #             #TruePositive+=1
+        # #                  trues +=1
+        #         #if(low_values_indices_true[j]==True and low_values_indices[j]==False):
+        #         #    FalseNegative+=1
+        # #                  trues += 1
+        #         if(low_values_indices_true[j]==False and low_values_indices[j]==True):
+        #             FalsePositive+=1
+        # #                  falses +=1
+        #
+        #
+        #     TruePositives.append(TruePositive/trues)
+        #     FalsePositives.append(FalsePositive/falses)
+        #
+        # #result = (epoch,batchsize,TruePositives,FalsePositives)
+        # #results.append(result);
+        #
+        # #falsePositive = np.asarray(falsePositive,dtype=np.float32)
+        #
+        #
+        # # plt.plot(FalsePositives,TruePositives)
+        # # plt.savefig("mod_batch_%g_epoch_%g_trues.png"%(batchsize,epoch))
 
-            for j in range(len(low_values_indices)):
-                if(low_values_indices_true[j]==False and low_values_indices[j]==False):
-                    TrueNegative+=1
-                #if(low_values_indices_true[j]==True and low_values_indices[j]==True):
-                    #TruePositive+=1
-        #                  trues +=1
-                #if(low_values_indices_true[j]==True and low_values_indices[j]==False):
-                #    FalseNegative+=1
-        #                  trues += 1
-                if(low_values_indices_true[j]==False and low_values_indices[j]==True):
-                    FalsePositive+=1
-        #                  falses +=1
+        TruePositives = np.asarray(tpr,dtype=np.float32)
+        FalsePositives = np.asarray(fpr,dtype=np.float32)
 
+        truesPath = trainS[0][:-4] + "mod_batch_" + batchsize + "epoch" + epoch + "_trues.out"
+        falsesPath = trainS[0][:-4] + "mod_batch_" + batchsize + "epoch" + epoch + "_falses.out"
 
-            TruePositives.append(TruePositive/trues)
-            FalsePositives.append(FalsePositive/falses)
+        np.savetxt(truesPath,(TruePositives))
+        np.savetxt(falsesPath,(FalsePositives))
 
-        #result = (epoch,batchsize,TruePositives,FalsePositives)
-        #results.append(result);
+        result = (epochs,batchsize,history.history['acc'],history.history['loss'],history.history['val_loss'],history.history['val_acc'],TruePositives,FalsePositives)
+        results.append(result)
 
-        #falsePositive = np.asarray(falsePositive,dtype=np.float32)
+filePKName = trainS[0][:-4] + ".pik"
+with open(filePKName, 'wb') as f:
+  pickle.dump(results, f, -1)
+        #np.savetxt("mod_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
 
-
-        # plt.plot(FalsePositives,TruePositives)
-        # plt.savefig("mod_batch_%g_epoch_%g_trues.png"%(batchsize,epoch))
-
-        TruePositives = np.asarray(TruePositives,dtype=np.float32)
-        FalsePositives = np.asarray(FalsePositives,dtype=np.float32)
-
-        np.savetxt("mod_batch_%g_epoch_%g_trues.out"%(batchsize,epoch),(TruePositives))
-        np.savetxt("mod_batch_%g_epoch_%g_falses.out"%(batchsize,epoch),(FalsePositives))
-        np.savetxt("mod_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
-
-        print("  - ROC Area  = %g "%(auc(FalsePositives,TruePositives)))
+        #print("  - ROC Area  = %g "%(auc(FalsePositives,TruePositives)))
 
 
 
