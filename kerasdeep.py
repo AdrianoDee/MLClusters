@@ -121,7 +121,7 @@ for epoch in epochs:
         FalsePositives = []
 
         fpr, tpr, _ = roc_curve(y_test_score, predicted_target_score)
-        print("Auto area ROC : %g",(roc_auc = auc(fpr, tpr)))
+        print("Auto area ROC : %g",(auc(fpr, tpr)))
 
 
         # fpr, tpr, Thresholds = metrics.roc_curve(y_test_score, predicted_target_score, pos_label=2)
