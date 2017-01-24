@@ -15,6 +15,8 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import model_from_json, Sequential
 from keras.layers import Dense, Dropout, Activation, Convolution2D, Convolution3D, Flatten, MaxPooling2D, MaxPooling3D, Merge
 from keras.callbacks import History
+from sklearn import metrics
+import ROOT
 
 import matplotlib.pyplot as plt
 #from tensorflow.python.framework import dtypes
@@ -31,8 +33,11 @@ pile = 2
 batchsize = 1000
 lDel = False
 
-# trainS = ['clusterstrain0_1.txt','clusterstrainlabels0_1.txt']
-# testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
+#trainS = ['clusterstrain0_1.txt','clusterstrainlabels0_1.txt']
+#testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
+
+#trainS = ['clusters0_1.txt','clusterslabels0_1.txt']
+#testS  = ['clusters0_1.txt','clusterslabels0_1.txt']
 
 # trainS = ['dets_0_1_mods_176_144train.txt','dets_0_1_mods_176_144labelstrain.txt']
 # testS  = ['dets_0_1_mods_176_144test.txt','dets_0_1_mods_176_144labelstest.txt']
@@ -40,9 +45,9 @@ lDel = False
 trainS = ['dets_0_1_mods_192_176train.txt','dets_0_1_mods_192_176labelstrain.txt']
 testS  = ['dets_0_1_mods_192_176test.txt','dets_0_1_mods_192_176labelstest.txt']
 
-batchsizes = [25,70,100,150,200]
+batchsizes = [100,20,50,70,100,150,200]
 #batchsizes = [250,500,1000,10000]#,500,1000,10000]
-epochs = [10,20]
+epochs = [1,10,20]
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
@@ -110,6 +115,15 @@ for epoch in epochs:
         TruePositives = []
         FalsePositives = []
 
+        # fpr, tpr, Thresholds = metrics.roc_curve(y_test_score, predicted_target_score, pos_label=2)
+        #
+        # print(fpr)
+        #
+        # print(tpr)
+        #
+        # print(Thresholds)
+        #
+        # areaSK = metrics.auc(fpr,tpr)
 
         #print(falses)
 
@@ -122,16 +136,16 @@ for epoch in epochs:
             FalsePositive = 0
             TrueNegative = 0
             FalseNegative = 0
-            All = len(low_values_indices)
+            #All = len(low_values_indices)
 
             for j in range(len(low_values_indices)):
                 if(low_values_indices_true[j]==False and low_values_indices[j]==False):
                     TrueNegative+=1
-                if(low_values_indices_true[j]==True and low_values_indices[j]==True):
-                    TruePositive+=1
+                #if(low_values_indices_true[j]==True and low_values_indices[j]==True):
+                    #TruePositive+=1
         #                  trues +=1
-                if(low_values_indices_true[j]==True and low_values_indices[j]==False):
-                    FalseNegative+=1
+                #if(low_values_indices_true[j]==True and low_values_indices[j]==False):
+                #    FalseNegative+=1
         #                  trues += 1
                 if(low_values_indices_true[j]==False and low_values_indices[j]==True):
                     FalsePositive+=1
@@ -141,14 +155,14 @@ for epoch in epochs:
             TruePositives.append(TruePositive/trues)
             FalsePositives.append(FalsePositive/falses)
 
-        result = (epoch,batchsize,TruePositives,FalsePositives)
-        results.append(result);
+        #result = (epoch,batchsize,TruePositives,FalsePositives)
+        #results.append(result);
 
         #falsePositive = np.asarray(falsePositive,dtype=np.float32)
 
 
-        plt.plot(FalsePositives,TruePositives)
-        plt.savefig("mod_batch_%g_epoch_%g_trues.png"%(batchsize,epoch))
+        # plt.plot(FalsePositives,TruePositives)
+        # plt.savefig("mod_batch_%g_epoch_%g_trues.png"%(batchsize,epoch))
 
         TruePositives = np.asarray(TruePositives,dtype=np.float32)
         FalsePositives = np.asarray(FalsePositives,dtype=np.float32)
@@ -156,6 +170,8 @@ for epoch in epochs:
         np.savetxt("mod_batch_%g_epoch_%g_trues.out"%(batchsize,epoch),(TruePositives))
         np.savetxt("mod_batch_%g_epoch_%g_falses.out"%(batchsize,epoch),(FalsePositives))
         np.savetxt("mod_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
+
+        print("  - ROC Area  = %g "%(metrics.auc(FalsePositives,TruePositives)))
 
               #plt.savefig("trueFalse.png")
 
