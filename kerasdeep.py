@@ -99,7 +99,9 @@ for epoch in epochs:
         trues = (y_test_score == 1.0).sum();
 
         print(history.history.keys())
-        print(history.history.['acc'])
+        print(history.history['acc'])
+        print(history.history['loss'])
+        print(history.history['val_loss'])
 
         print("-- Testing with dataset with %g false and %g true"%(falses,trues))
 
