@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from sklearn import metrics
+import pickle
 
 falsPath = "half_batch_5_epoch_10_falses.out";
 truePath = "half_batch_5_epoch_10_thresh.out";
