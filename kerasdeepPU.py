@@ -53,8 +53,8 @@ epochs = [1,10,20,50,100,150]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-#datas = ['0001','0003','0002'];
-datas = ['test','test2']
+datas = ['0001','0002','0003']
+#datas = ['test','test2']
 
 (X_train, y_train), (X_test, y_test) = ku.doublets_read_data_sets_PU(0,1,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile,neurons=4)
 
@@ -111,7 +111,7 @@ for batchsize in batchsizes:
         predicted_target_score = predicted_target[:,0]
 
         #print(y_test_score)
-        #print(predicted_target_score)
+        #vi print(predicted_target_score)
 
         #truePosivites = []
         #falsePositive = []

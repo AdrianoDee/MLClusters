@@ -206,9 +206,9 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
 
     print(" - Train Dasets : ")
     print(datasets)
-    print(" - Train Dataset : ")
+    print(" - Test Dataset : ")
     print(test_dir)
-    
+
     train_clusters = numpy.array([])
     train_clusters_labels = numpy.array([])
     test_clusters = numpy.array([])
@@ -222,19 +222,22 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
     for aClass in AllClasses:
         print("============== Reading class %s ============================"%(aClass))
         for data in datasets:
-            train_file = os.path.join(filedir + data + '/' + aClass, DATASET)
+            if(test_clusters_Class[aClass].size>10*countClassTest['matching']+1 and test_clusters_Class[aClass].size>10*countClassTest['notMatching']+1):
+                print("Enough doublets for this class.")
+            else:
+                train_file = os.path.join(filedir + data + '/' + aClass, DATASET)
 
-            with open(train_file, 'rb') as f:
-                trainC = data_clusters_PU(f,cols,rows,stack)
-                # trainL = data_clusterslabels_PU(len(trainC),aClass)
+                with open(train_file, 'rb') as f:
+                    trainC = data_clusters_PU(f,cols,rows,stack)
+                    # trainL = data_clusterslabels_PU(len(trainC),aClass)
 
-                countClass[aClass] = countClass[aClass] + len(trainC)
+                    countClass[aClass] = countClass[aClass] + len(trainC)
 
-                if(train_clusters_Class[aClass].size == 0):
-                    train_clusters_Class[aClass] = trainC
-                else:
-                    train_clusters_Class[aClass] = numpy.append(train_clusters_Class[aClass],trainC,axis=0)
-                # train_clusters_labels_Class[aClass].append(trainL)
+                    if(train_clusters_Class[aClass].size == 0):
+                        train_clusters_Class[aClass] = trainC
+                    else:
+                        train_clusters_Class[aClass] = numpy.append(train_clusters_Class[aClass],trainC,axis=0)
+                    # train_clusters_labels_Class[aClass].append(trainL)
 
         print("For class %s collected %g doublets.\n"%(aClass,countClass[aClass]))
         print("==================================================================")
@@ -279,7 +282,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
     for dClass in AllClasses:
         test_file = os.path.join(filedir + test_dir + '/' + dClass, DATASET)
 
-        with open(train_file, 'rb') as f:
+        with open(test_file, 'rb') as f:
             testC = data_clusters_PU(f,cols,rows,stack)
             # trainL = data_clusterslabels_PU(len(trainC),aClass)                #print(trainC)
             countClassTest[aClass] = countClass[dClass] + len(testC)
@@ -288,6 +291,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
                 test_clusters_Class[dClass] = testC
             else:
                 test_clusters_Class[dClass] = numpy.append(testC,axis=0)
+
 
                 # train_clusters_labels_Class[aClass].append(trainL)
 
