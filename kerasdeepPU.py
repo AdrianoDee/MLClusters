@@ -72,8 +72,8 @@ clustercnn.add(MaxPooling3D(pool_size=(2,2,2),border_mode='valid'))
 #clustercnn.add(MaxPooling3D(pool_size=(2,2,2),border_mode='valid'))
 clustercnn.add(Flatten())
 clustercnn.add(Dense(512, activation='relu'))
-clustercnn.add(Dropout(0.25))
-clustercnn.add(Dense(2, activation='softmax'))
+clustercnn.add(Dropout(0.75))
+clustercnn.add(Dense(4, activation='softmax'))
 #clustercnn.add(Activation('softmax'))
 #clustercnn.add(Dense(2, activation='sigmoid'))
 #clustercnn.add(Dense(1, activation='softmax'))
@@ -97,8 +97,8 @@ for batchsize in batchsizes:
         #print(predicted_target)
         #print(y_test)
 
-        print(y_train)
-        print(predicted_target)
+        #print(y_train)
+        #print(predicted_target)
 
         y_test_score = y_train[:,1]
 

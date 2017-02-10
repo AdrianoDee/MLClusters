@@ -75,23 +75,40 @@ def data_clusterslabels(f,num_classes=2,lDelimiter=False):
     return labels_onedim
     #return labels
 
-def data_clusterslabels_PU(Number,Class):
+def data_clusterslabels_PU(Number,Class,num_classes=2):
 
-    #Matching
-    if Class == AllClasses[0]:
-        labels = numpy.full((Number, 2), [0. , 0.])
+    if(num_classes==2):
+        #Matching
+        if Class == AllClasses[0]:
+            labels = numpy.full((Number, num_classes), [0. , 0.])
 
-    #Not Matching
-    if Class == AllClasses[1]:
-        labels = numpy.full((Number, 2), [0. , 1.])
+        #Not Matching
+        if Class == AllClasses[1]:
+            labels = numpy.full((Number, num_classes), [0. , 1.])
 
-    #One Not Sim
-    if Class == AllClasses[2]:
-        labels = numpy.full((Number, 2), [1. , 0.])
+        #One Not Sim
+        if Class == AllClasses[2]:
+            labels = numpy.full((Number, num_classes), [1. , 0.])
 
-    #Two Not Sim
-    if Class == AllClasses[3]:
-        labels = numpy.full((Number, 2), [1. , 1.])
+        #Two Not Sim
+        if Class == AllClasses[3]:
+            labels = numpy.full((Number, num_classes), [1. , 1.])
+    if(num_classes==5):
+        #Matching
+        if Class == AllClasses[0]:
+            labels = numpy.full((Number, num_classes), [1. , 0. , 0. , 0.])
+
+        #Not Matching
+        if Class == AllClasses[1]:
+            labels = numpy.full((Number, num_classes), [0. , 1. , 0. , 0.])
+
+        #One Not Sim
+        if Class == AllClasses[2]:
+            labels = numpy.full((Number, num_classes), [0. , 0. , 1. , 0.])
+
+        #Two Not Sim
+        if Class == AllClasses[3]:
+            labels = numpy.full((Number, num_classes), [0. , 0. , 0. , 1.])
 
     return labels
     #return labels
