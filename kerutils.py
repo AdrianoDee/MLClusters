@@ -243,20 +243,20 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
 
 
     minimum = min(countClass['matching'],countClass['notMatching'])
-    print(minimum)
+    #print(minimum)
 
-    for aClass in AllClasses:
-        idxs = numpy.random.randint(train_clusters_Class[aClass].shape[0], size=minimum)
-        train_clusters_Class[aClass] = train_clusters_Class[aClass][idxs, :]
-        train_clusters_labels_Class[aClass] = train_clusters_labels_Class[aClass][idxs, :]
+    for bClass in AllClasses:
+        idxs = numpy.random.randint(train_clusters_Class[bClass].shape[0], size=minimum)
+        train_clusters_Class[bClass] = train_clusters_Class[bClass][idxs, :]
+        train_clusters_labels_Class[bClass] = train_clusters_labels_Class[bClass][idxs, :]
 
-    for aClass in AllClasses:
+    for cClass in AllClasses:
         if (train_clusters.size == 0):
-            train_clusters = train_clusters_Class[aClass]
-            train_clusters_labels = train_clusters_labels_Class[aClass]
+            train_clusters = train_clusters_Class[cClass]
+            train_clusters_labels = train_clusters_labels_Class[cClass]
         else:
-            train_clusters = numpy.append(train_clusters,train_clusters_Class[aClass],axis=0)
-            train_clusters_labels = numpy.append(train_clusters_labels,train_clusters_labels_Class[aClass],axis=0)
+            train_clusters = numpy.append(train_clusters,train_clusters_Class[cClass],axis=0)
+            train_clusters_labels = numpy.append(train_clusters_labels,train_clusters_labels_Class[cClass],axis=0)
 
     test_clusters_Class = {AllClasses[0]:numpy.array([]),AllClasses[1]:numpy.array([]),AllClasses[2]:numpy.array([]),AllClasses[3]:numpy.array([])}
     test_clusters_labels_Class = {AllClasses[0]:numpy.array([]),AllClasses[1]:numpy.array([]),AllClasses[2]:numpy.array([]),AllClasses[3]:numpy.array([])}
@@ -270,24 +270,25 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
     #         test_clusters.append(data_clusters_PU(f,cols,rows,stack))
     #         test_clusters_labels.append(data_clusterslabels_PU(len(test_clusters),aClass))
 
-    for aClass in AllClasses:
-        test_file = os.path.join(filedir + test_dir + '/' + aClass, DATASET)
+    print("============================ Test ==================================")
+    for dClass in AllClasses:
+        test_file = os.path.join(filedir + test_dir + '/' + dClass, DATASET)
 
         with open(train_file, 'rb') as f:
             testC = data_clusters_PU(f,cols,rows,stack)
             # trainL = data_clusterslabels_PU(len(trainC),aClass)                #print(trainC)
-            countClassTest[aClass] = countClass[aClass] + len(testC)
+            countClassTest[aClass] = countClass[dClass] + len(testC)
 
-            if(test_clusters_Class[aClass].size == 0):
-                test_clusters_Class[aClass] = testC
+            if(test_clusters_Class[dClass].size == 0):
+                test_clusters_Class[dClass] = testC
             else:
-                test_clusters_Class[aClass] = numpy.append(testC,axis=0)
+                test_clusters_Class[dClass] = numpy.append(testC,axis=0)
 
                 # train_clusters_labels_Class[aClass].append(trainL)
 
-        print("For class %s collected %g doublets.\n"%(aClass,countClassTest[aClass]))
+        print("For class %s collected %g doublets.\n"%(aClass,countClassTest[dClass]))
 
-        test_clusters_labels_Class[aClass] = data_clusterslabels_PU(countClassTest[aClass],'matching',num_classes=neurons)
+        test_clusters_labels_Class[dClass] = data_clusterslabels_PU(countClassTest[dClass],dClass,num_classes=neurons)
         #print(train_clusters_Class[aClass].shape[0])
 
     minimum = min(countClassTest['matching'],countClassTest['notMatching'])
