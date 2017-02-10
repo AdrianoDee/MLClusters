@@ -97,8 +97,8 @@ for batchsize in batchsizes:
         #print(predicted_target)
         #print(y_test)
 
-        print(y_test)
-        print(predicted_target)
+        #print(y_test)
+        #print(predicted_target)
 
         y_test_score = y_test[:,0]
 
@@ -110,8 +110,8 @@ for batchsize in batchsizes:
 
         predicted_target_score = predicted_target[:,0]
 
-        print(y_test_score)
-        print(predicted_target_score)
+        #print(y_test_score)
+        #print(predicted_target_score)
 
         #truePosivites = []
         #falsePositive = []
