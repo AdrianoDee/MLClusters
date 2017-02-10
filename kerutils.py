@@ -12,6 +12,7 @@ import tensorflow as tf
 
 from tensorflow.contrib.learn.python.learn.datasets import base
 from tensorflow.python.framework import dtypes
+from sklearn.utils import shuffle
 
 AllClasses  = ['matching', 'notMatching','oneNotSim','twoNotSim']
 
@@ -203,6 +204,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
     testId = numpy.random.random_integers(len(datasets)-1)
     test_dir = datasets[testId]
     datasets = numpy.delete(datasets,testId,0)
+    numpy.random.shuffle(datasets)
 
     print(" - Train Dasets : ")
     print(datasets)
@@ -266,6 +268,8 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
             train_clusters = numpy.append(train_clusters,train_clusters_Class[cClass],axis=0)
             train_clusters_labels = numpy.append(train_clusters_labels,train_clusters_labels_Class[cClass],axis=0)
 
+    train_clusters, train_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
+
     test_clusters_Class = {AllClasses[0]:numpy.array([]),AllClasses[1]:numpy.array([]),AllClasses[2]:numpy.array([]),AllClasses[3]:numpy.array([])}
     test_clusters_labels_Class = {AllClasses[0]:numpy.array([]),AllClasses[1]:numpy.array([]),AllClasses[2]:numpy.array([]),AllClasses[3]:numpy.array([])}
 
@@ -314,5 +318,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
         else:
             test_clusters = numpy.append(test_clusters,test_clusters_Class[aClass],axis=0)
             test_clusters_labels = numpy.append(test_clusters_labels,test_clusters_labels_Class[aClass],axis=0)
+
+    test_clusters, test_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
 
     return (train_clusters,train_clusters_labels), (test_clusters, test_clusters_labels)
