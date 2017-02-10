@@ -204,6 +204,11 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
     test_dir = datasets[testId]
     datasets = numpy.delete(datasets,testId,0)
 
+    print(" - Train Dasets : ")
+    print(datasets)
+    print(" - Train Dataset : ")
+    print(test_dir)
+    
     train_clusters = numpy.array([])
     train_clusters_labels = numpy.array([])
     test_clusters = numpy.array([])
