@@ -222,7 +222,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
     for aClass in AllClasses:
         print("============== Reading class %s ============================"%(aClass))
         for data in datasets:
-            if(test_clusters_Class[aClass].size>10*countClassTest['matching']+1 and test_clusters_Class[aClass].size>10*countClassTest['notMatching']+1):
+            if(train_clusters_Class[aClass].size>10*countClass['matching']+1 and train_clusters_Class[aClass].size>10*countClass['notMatching']+1):
                 print("Enough doublets for this class.")
             else:
                 train_file = os.path.join(filedir + data + '/' + aClass, DATASET)
