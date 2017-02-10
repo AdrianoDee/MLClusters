@@ -289,7 +289,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
         with open(test_file, 'rb') as f:
             testC = data_clusters_PU(f,cols,rows,stack)
             # trainL = data_clusterslabels_PU(len(trainC),aClass)                #print(trainC)
-            countClassTest[aClass] = countClass[dClass] + len(testC)
+            countClassTest[dClass] = countClassTest[dClass] + len(testC)
 
             if(test_clusters_Class[dClass].size == 0):
                 test_clusters_Class[dClass] = testC
