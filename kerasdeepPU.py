@@ -56,7 +56,7 @@ epochs = [1,10,20,50,100,150]
 datas = ['0001','0003','0002'];
 #datas = ['test','test2']
 
-(X_train, y_train), (X_test, y_test) = ku.doublets_read_data_sets_PU(0,1,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile)
+(X_train, y_train), (X_test, y_test) = ku.doublets_read_data_sets_PU(0,1,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile,neurons=4)
 
 
 clustercnn = Sequential()
