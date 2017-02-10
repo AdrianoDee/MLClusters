@@ -53,8 +53,8 @@ epochs = [1,10,20,50,100,150]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-datas = ['0001','0003','0002'];
-#datas = ['test','test2']
+#datas = ['0001','0003','0002'];
+datas = ['test','test2']
 
 (X_train, y_train), (X_test, y_test) = ku.doublets_read_data_sets_PU(0,1,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile,neurons=4)
 
@@ -91,27 +91,31 @@ for batchsize in batchsizes:
         #early = ker.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=0, verbose=0, mode='auto')
         history = clustercnn.fit(X_train, y_train,validation_split=0.33, nb_epoch=epoch, batch_size=batchsize,shuffle=True,verbose=0)#,callbacks=[early])
 
-        predicted_target = clustercnn.predict(X_train)
-        loss_test = clustercnn.evaluate(X_train,predicted_target,batch_size=batchsize)
+        predicted_target = clustercnn.predict(X_test)
+        loss_test = clustercnn.evaluate(X_test,predicted_target,batch_size=batchsize)
         #print(predicted_target.shape())
         #print(predicted_target)
         #print(y_test)
 
-        #print(y_train)
-        #print(predicted_target)
+        print(y_test)
+        print(predicted_target)
 
-        y_test_score = y_train[:,1]
+        y_test_score = y_test[:,0]
 
         falses = (y_test_score == 0.0).sum();
         trues = (y_test_score == 1.0).sum();
 
+
         print(" \n -- Testing with dataset with %g false and %g true"%(falses,trues))
 
-        predicted_target_score = predicted_target[:,1]
+        predicted_target_score = predicted_target[:,0]
 
-        truePosivites = []
-        falsePositive = []
-        values = []
+        print(y_test_score)
+        print(predicted_target_score)
+
+        #truePosivites = []
+        #falsePositive = []
+        #values = []
 
         #thresholds = np.linspace(np.amin(predicted_target_score), 1.0, num=10000)
 

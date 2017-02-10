@@ -233,7 +233,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
 
         print("For class %s collected %g doublets.\n"%(aClass,countClass[aClass]))
         print("==================================================================")
-        train_clusters_labels_Class[aClass] = data_clusterslabels_PU(countClass[aClass],aClass,num_classes=neurons)
+        train_clusters_labels_Class[aClass] = data_clusterslabels_PU(countClass[aClass],"matching",num_classes=neurons)
         #print(train_clusters_Class[aClass].shape[0])
         #print(train_clusters_Class[aClass])
         #print(train_clusters_labels_Class[aClass].shape[0])
@@ -287,7 +287,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
 
         print("For class %s collected %g doublets.\n"%(aClass,countClassTest[aClass]))
 
-        test_clusters_labels_Class[aClass] = data_clusterslabels_PU(countClassTest[aClass],aClass)
+        test_clusters_labels_Class[aClass] = data_clusterslabels_PU(countClassTest[aClass],'matching',num_classes=neurons)
         #print(train_clusters_Class[aClass].shape[0])
 
     minimum = min(countClassTest['matching'],countClassTest['notMatching'])
