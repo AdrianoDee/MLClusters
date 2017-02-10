@@ -93,7 +93,7 @@ def data_clusterslabels_PU(Number,Class,num_classes=2):
         #Two Not Sim
         if Class == AllClasses[3]:
             labels = numpy.full((Number, num_classes), [1. , 1.])
-    if(num_classes==4):
+    if(num_classes==5):
         #Matching
         if Class == AllClasses[0]:
             labels = numpy.full((Number, num_classes), [1. , 0. , 0. , 0.])
@@ -194,7 +194,7 @@ def doublets_read_data_sets(trainsets,testsets,
 
 def doublets_read_data_sets_PU(detIn,detOu,datasets,
     dtype=dtypes.uint16,filedir='./Hits/',
-    reshape=True,cols=8,rows=8,stack=2,neurons=2):
+    reshape=True,cols=8,rows=8,stack=2):
 
     DATASET = 'clusters_' + str(detIn) + '_' + str(detOu) + '.txt'
 
@@ -233,7 +233,7 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
 
         print("For class %s collected %g doublets.\n"%(aClass,countClass[aClass]))
         print("==================================================================")
-        train_clusters_labels_Class[aClass] = data_clusterslabels_PU(countClass[aClass],aClass,num_classes=neurons)
+        train_clusters_labels_Class[aClass] = data_clusterslabels_PU(countClass[aClass],aClass)
         #print(train_clusters_Class[aClass].shape[0])
         #print(train_clusters_Class[aClass])
         #print(train_clusters_labels_Class[aClass].shape[0])
