@@ -53,8 +53,8 @@ epochs = [1,10,20,50,100,150]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-datas = ['0001','0002','0003','0005']
-#datas = ['test','test2']
+#datas = ['0001','0002','0003','0005']
+datas = ['test','test2']
 
 (X_train, y_train), (X_test, y_test) = ku.doublets_read_data_sets_PU(0,1,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile,neurons=4)
 
@@ -89,7 +89,7 @@ for batchsize in batchsizes:
         print("-- Training with %g (%g epochs)"%(batchsize,epoch))
         history = History()
         #early = ker.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=0, verbose=0, mode='auto')
-        history = clustercnn.fit(X_train, y_train,validation_split=0.33, nb_epoch=epoch, batch_size=batchsize,shuffle=True,verbose=0)#,callbacks=[early])
+        history = clustercnn.fit(X_train, y_train,validation_split=0.3, nb_epoch=epoch, batch_size=batchsize,shuffle=True,verbose=0)#,callbacks=[early])
 
         predicted_target = clustercnn.predict(X_test)
         loss_test = clustercnn.evaluate(X_test,predicted_target,batch_size=batchsize)
@@ -110,8 +110,8 @@ for batchsize in batchsizes:
 
         predicted_target_score = predicted_target[:,0]
 
-        #print(y_test_score)
-        #vi print(predicted_target_score)
+        print(y_test_score)
+        print(predicted_target_score)
 
         #truePosivites = []
         #falsePositive = []

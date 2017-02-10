@@ -319,6 +319,8 @@ def doublets_read_data_sets_PU(detIn,detOu,datasets,
             test_clusters = numpy.append(test_clusters,test_clusters_Class[aClass],axis=0)
             test_clusters_labels = numpy.append(test_clusters_labels,test_clusters_labels_Class[aClass],axis=0)
 
-    test_clusters, test_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
+    test_clusters, test_clusters_labels = shuffle(test_clusters, test_clusters_labels, random_state=0)
+
+    #print(test_clusters_labels)
 
     return (train_clusters,train_clusters_labels), (test_clusters, test_clusters_labels)
