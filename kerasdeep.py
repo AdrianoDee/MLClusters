@@ -47,13 +47,13 @@ testS  = ['clusters_0_1.txt','clusterslabels0_1.txt']
 #trainS = ['dets_0_1_mods_192_176train.txt','dets_0_1_mods_192_176labelstrain.txt']
 #testS  = ['dets_0_1_mods_192_176test.txt','dets_0_1_mods_192_176labelstest.txt']
 
-batchsizes = [50]
+batchsizes = [25,50]
 #batchsizes = [250,500,1000,10000]#,500,1000,10000]
 epochs = [1,10,20,50,100,150]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-datas = ['0001'];
+datas = ['0001','0002','0003'];
 
 (X_train, y_train), (X_test, y_test) = ku.doublets_read_data_sets_PU(0,1,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile)
 
