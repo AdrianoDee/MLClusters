@@ -28,7 +28,7 @@ def data_clusters(f,cols,rows,stack):
 
       print ("Reading clusters from ",f.name)
       #data = numpy.loadtxt(f,delimiter=' ',dtype = numpy.uint16)
-      data = numpy.genfromtxt(f, delimiter=' ',dtype = numpy.uint16))
+      data = numpy.genfromtxt(f, delimiter=' ',dtype = numpy.uint16)
       print(len(data), " data size ")
       num_doub_clusters = numpy.uint64(len(data)/(rows*cols*stack))
       if stack == 2:
