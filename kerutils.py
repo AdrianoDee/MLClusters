@@ -359,8 +359,8 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   trueClusters = numpy.take(trueClusters,idxs)
   trueLabels = numpy.take(trueLabels,idxs)
 
-  train_clusters = numpy.append(trueClustersF,falseClusters,axis=0)
-  train_clusters_labels  = numpy.append(trueLabelsF,falseLabels,axis=0)
+  train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
+  train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
 
   print("============== Reading Test Dataset in %s ============================"%(datasets))
 
