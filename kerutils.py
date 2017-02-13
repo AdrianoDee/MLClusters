@@ -250,8 +250,8 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
       truesIndex  =  numpy.where(train_clusters_labels_one[:,1]==1.0)[0]
       falsesIndex =  numpy.where(train_clusters_labels_one[:,1]==0.0)[0]
       #
-      trueClusters = train_clusters[truesIndex]
-      trueLabels   = train_clusters_labels[truesIndex]
+      trueClustersF = train_clusters[truesIndex]
+      trueLabelsF   = train_clusters_labels[truesIndex]
 
       falseClusters = train_clusters[falsesIndex]
       falseLabels   = train_clusters_labels[falsesIndex]
@@ -260,7 +260,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
 
       idxs = numpy.random.randint(trueClusters.shape[0], size=falseLabels.size)
 
-      trueClusters = trueClusters[idxs]
+      trueClusters = trueClustersF[idxs]
 
       print(trueClusters.shape[0])
       trueLabels = trueLabels[idxs]
