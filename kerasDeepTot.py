@@ -54,9 +54,9 @@ epochs = [1,10,20,50]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-datas = ['0001','0002'];
+datas = ['0001','0002','0003'];
 
-(X_train, y_train), (X_test, y_test) = ku.doubletsReadPost(detIn=dIn,detOu=dOu,datasets=datas,filedir='./HitsPost/',cols=size,rows=size,stack=pile)
+(X_train, y_train), (X_test, y_test) = ku.doubletsReadPost(detIn=dIn,detOu=dOu,datasets=datas,sanitize=True,filedir='./HitsPost/',cols=size,rows=size,stack=pile)
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
@@ -71,7 +71,7 @@ clustercnn.add(MaxPooling3D(pool_size=(2,2,2),border_mode='valid'))
 #clustercnn.add(MaxPooling3D(pool_size=(2,2,2),border_mode='valid'))
 clustercnn.add(Flatten())
 clustercnn.add(Dense(512, activation='relu'))
-clustercnn.add(Dropout(0.25))
+clustercnn.add(Dropout(0.5))
 clustercnn.add(Dense(2, activation='softmax'))
 #clustercnn.add(Activation('softmax'))
 #clustercnn.add(Dense(2, activation='sigmoid'))
