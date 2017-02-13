@@ -271,8 +271,8 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
   data_file_test = os.path.join(filedir + test_dir, DATASET)
   labels_file_test = os.path.join(filedir + test_dir, LABELS)
 
-  with open(data_file, 'rb') as f:
-      with open(labels_file, 'rb') as fl:
+  with open(data_file_test, 'rb') as f:
+      with open(labels_file_test, 'rb') as fl:
           test_clusters = data_clusters(f,cols,rows,stack)
           test_clusters_labels = data_clusterslabels(fl)
 
