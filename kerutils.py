@@ -163,7 +163,7 @@ def accuracy_measure(y_actual, y_hat):
   return(TruePositive, FalsePositive, TrueNegative, FalseNegative)
 
 def doublets_read_data_sets(trainsets,testsets,
-                   dtype=dtypes.uint16,train_dir='./HitsPost/',
+                   dtype=dtypes.uint16,train_dir='./Hits/',
                    reshape=True,cols=8,rows=8,stack=2):
 
   TRAIN_DATASET = trainsets[0]
@@ -216,7 +216,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
   datasets = numpy.delete(datasets,testId,0)
   numpy.random.shuffle(datasets)
 
-  print(" - Train Dasets : ")
+  print(" - Train Datasets : ")
   print(datasets)
   print(" - Test Dataset : ")
   print(test_dir)
@@ -301,11 +301,11 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   LABELS = 'dets_'
 
   if train:
-      DATASET += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modIn) + '.txt'
-      LABELS += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modIn) +  'labels.txt'
-  else:
-      DATASET += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modIn) + '.txt'
-      LABELS += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modIn) +  'labels.txt'
+      DATASET += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) + '.txt'
+      LABELS += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) +  'labels.txt'
+  elsemodOu
+      DATASET += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) + '.txt'
+      LABELS += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) +  'labels.txt'
 
 
   testId = numpy.random.random_integers(len(datasets)-1)
@@ -313,7 +313,7 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   datasets = numpy.delete(datasets,testId,0)
   numpy.random.shuffle(datasets)
 
-  print(" - Train Dasets : ")
+  print(" - Train Datasets : ")
   print(datasets)
   print(" - Test Dataset : ")
   print(test_dir)
@@ -409,7 +409,7 @@ def doubletsReadPre(detIn,detOu,datasets,
     datasets = numpy.delete(datasets,testId,0)
     numpy.random.shuffle(datasets)
 
-    print(" - Train Dasets : ")
+    print(" - Train Datasets : ")
     print(datasets)
     print(" - Test Dataset : ")
     print(test_dir)
