@@ -363,9 +363,10 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=false,
   data_file_test = os.path.join(filedir + test_dir, DATASET)
   labels_file_test = os.path.join(filedir + test_dir, LABELS)
 
-  with open(data_file, 'rb') as f and open(labels_file, 'rb') as fl:
-      test_clusters = data_clusters(f,cols,rows,stack)
-      test_clusters_labels = data_clusterslabels(fl)
+  with open(data_file, 'rb') as f:
+      with open(labels_file, 'rb') as fl:
+          test_clusters = data_clusters(f,cols,rows,stack)
+          test_clusters_labels = data_clusterslabels(fl)
 
   truesIndex  =  (test_clusters==1.0)
   falsesIndex =  (test_clusters_labels==0.0)
