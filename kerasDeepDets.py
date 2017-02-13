@@ -58,7 +58,7 @@ epochs = [1,10,20,50]
 
 datas = ['0001','0002'];
 
-#(X_train, y_train), (X_test, y_test) = ku.doubletsReadPost(detIn=dIn,detOu=dOu,datasets=datas,filedir='./HitsPost/',cols=size,rows=size,stack=pile)
+(X_train, y_train), (X_test, y_test) = ku.doubletsReadPost(detIn=dIn,detOu=dOu,datasets=datas,filedir='./HitsPost/',cols=size,rows=size,stack=pile,sanitize=True)
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
@@ -79,7 +79,7 @@ clustercnn.add(Dense(2, activation='softmax'))
 #clustercnn.add(Dense(2, activation='sigmoid'))
 #clustercnn.add(Dense(1, activation='softmax'))
 
-(X_train, y_train), (X_test, y_test) = ku.base_read_data_sets(trainsets=trainS,testsets=testS,train_dir='./HitsPost/0001/',cols=size,rows=size,stack=pile,l_delimiter=lDel)
+#(X_train, y_train), (X_test, y_test) = ku.base_read_data_sets(trainsets=trainS,testsets=testS,train_dir='./HitsPost/0001/',cols=size,rows=size,stack=pile,l_delimiter=lDel)
 clustercnn.compile(loss='binary_crossentropy',optimizer='sgd', metrics=['accuracy'])
 #early = EarlyStopping(monitor='val_loss', patience=0, verbose=0, mode='auto')
 
