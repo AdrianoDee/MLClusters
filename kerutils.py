@@ -163,7 +163,7 @@ def accuracy_measure(y_actual, y_hat):
   return(TruePositive, FalsePositive, TrueNegative, FalseNegative)
 
 def doublets_read_data_sets(trainsets,testsets,
-                   dtype=dtypes.uint16,train_dir='./Hits/',
+                   dtype=dtypes.uint16,train_dir='./HitsPost/',
                    reshape=True,cols=8,rows=8,stack=2):
 
   TRAIN_DATASET = trainsets[0]
