@@ -232,16 +232,17 @@ def doubletsReadPost(detIn,detOu,datasets,train=false,
       data_file = os.path.join(filedir + data, DATASET)
       labels_file = os.path.join(filedir + data, LABELS)
 
-      with open(data_file, 'rb') as f and open(labels_file, 'rb') as fl:
-          trainC = data_clusters(f,cols,rows,stack)
-          trainL = data_clusterslabels(fl)
+      with open(data_file, 'rb') as f:
+          with open(labels_file, 'rb') as fl:
+              trainC = data_clusters(f,cols,rows,stack)
+              trainL = data_clusterslabels(fl)
 
-          if(train_clusters.size == 0):
-              train_clusters = trainC
-              train_clusters_labels = trainL
-          else:
-              train_clusters = numpy.append(train_clusters,trainC,axis=0)
-              train_clusters_labels = numpy.append(trainL,trainC,axis=0)
+              if(train_clusters.size == 0):
+                  train_clusters = trainC
+                  train_clusters_labels = trainL
+              else:
+                  train_clusters = numpy.append(train_clusters,trainC,axis=0)
+                  train_clusters_labels = numpy.append(trainL,trainC,axis=0)
 
   truesIndex  =  (train_clusters_labels==1.0)
   falsesIndex =  (train_clusters_labels==0.0)
