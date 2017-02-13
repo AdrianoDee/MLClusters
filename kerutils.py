@@ -350,7 +350,7 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   falseClusters = numpy.extract(falsesIndex, train_clusters)
   falseLabels   = numpy.extract(falsesIndex, train_clusters_labels)
 
-  print("Read : %g true clusters and %g false clusters"%(trueLabels.shape[0],falseLabels.shape[0]))
+  print("Read : %g true clusters and %g false clusters"%(trueLabels.size,falseLabels.size))
 
   idxs = numpy.random.randint(trueClusters.shape[0], size=min(trueLabels.shape[0],falseLabels.shape[0]))
 
