@@ -193,7 +193,7 @@ def doublets_read_data_sets(trainsets,testsets,
   return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
 
 
-def doubletsReadPost(detIn,detOu,datasets,train=false,
+def doubletsReadPost(detIn,detOu,datasets,train=False,
                    dtype=dtypes.uint16,filedir='./HitsPost/',
                    cols=8,rows=8,stack=2):
 
@@ -293,7 +293,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=false,
 
   return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
 
-def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=false,
+def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
                    dtype=dtypes.uint16,filedir='./HitsPost/',
                    cols=8,rows=8,stack=2):
 
