@@ -343,24 +343,24 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
 
   train_clusters_labels_one = train_clusters_labels
 
-  truesIndex  =  numpy.where(train_clusters_labels_one[:,1]==1.0)[0]
-  falsesIndex =  numpy.where(train_clusters_labels_one[:,1]==0.0)[0]
-
-  trueClusters = numpy.take(train_clusters,truesIndex,axis=0)
-  trueLabels   = numpy.take(train_clusters_labels,truesIndex,axis=0)
-
-  falseClusters = numpy.take(train_clusters,falsesIndex,axis=0)
-  falseLabels   = numpy.take(train_clusters_labels,falsesIndex,axis=0)
-
-  print("Read : %g true clusters and %g false clusters"%(trueLabels.size,falseLabels.size))
-
-  idxs = numpy.random.randint(trueClusters.shape[0], size=falseLabels.size)
-
-  trueClusters = numpy.take(trueClusters,idxs,axis=0)
-  trueLabels = numpy.take(trueLabels,idxs,axis=0)
-
-  train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
-  train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
+  # truesIndex  =  numpy.where(train_clusters_labels_one[:,1]==1.0)[0]
+  # falsesIndex =  numpy.where(train_clusters_labels_one[:,1]==0.0)[0]
+  #
+  # trueClusters = numpy.take(train_clusters,truesIndex,axis=0)
+  # trueLabels   = numpy.take(train_clusters_labels,truesIndex,axis=0)
+  #
+  # falseClusters = numpy.take(train_clusters,falsesIndex,axis=0)
+  # falseLabels   = numpy.take(train_clusters_labels,falsesIndex,axis=0)
+  #
+  # print("Read : %g true clusters and %g false clusters"%(trueLabels.size,falseLabels.size))
+  #
+  # idxs = numpy.random.randint(trueClusters.shape[0], size=falseLabels.size)
+  #
+  # trueClusters = numpy.take(trueClusters,idxs,axis=0)
+  # trueLabels = numpy.take(trueLabels,idxs,axis=0)
+  #
+  # train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
+  # train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
 
   print("============== Reading Test Dataset in %s ============================"%(datasets))
 
