@@ -242,7 +242,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
                   train_clusters_labels = trainL
               else:
                   train_clusters = numpy.append(train_clusters,trainC,axis=0)
-                  train_clusters_labels = numpy.append(trainL,trainC,axis=0)
+                  train_clusters_labels = numpy.append(train_clusters_labels,trainL,axis=0)
 
   truesIndex  =  (train_clusters_labels==1.0)
   falsesIndex =  (train_clusters_labels==0.0)
