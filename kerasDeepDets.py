@@ -56,7 +56,7 @@ epochs = [1,5,10,20,50,100]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-datas = ['0001','0002'];
+datas = ['0001','0002','0003'];
 
 (X_train, y_train), (X_test, y_test) = ku.doubletsReadPost(detIn=dIn,detOu=dOu,datasets=datas,filedir='./HitsPost/',cols=size,rows=size,stack=pile,sanitize=True)
 
