@@ -50,9 +50,9 @@ testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
 #trainS = ['dets_0_1_mods_192_176train.txt','dets_0_1_mods_192_176labelstrain.txt']
 #testS  = ['dets_0_1_mods_192_176test.txt','dets_0_1_mods_192_176labelstest.txt']
 
-batchsizes = [30]
+batchsizes = [100,500,1000,50]
 #batchsizes = [250,500,1000,10000]#,500,1000,10000]
-epochs = [1,10,20,50]
+epochs = [1,5,10,20,50,100]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
