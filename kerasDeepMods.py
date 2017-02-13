@@ -92,16 +92,18 @@ for batchsize in batchsizes:
         #early = ker.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=0, verbose=0, mode='auto')
         history = clustercnn.fit(X_train, y_train,validation_split=0.33, nb_epoch=epoch, batch_size=batchsize,shuffle=True,verbose=0)#,callbacks=[early])
 
-        predicted_target = clustercnn.predict(X_train)
-        loss_test = clustercnn.evaluate(X_train,predicted_target,batch_size=batchsize)
+        predicted_target = clustercnn.predict(X_test)
+        loss_test = clustercnn.evaluate(X_test,predicted_target,batch_size=batchsize)
         #print(predicted_target.shape())
         #print(predicted_target)
         #print(y_test)
 
-        print(y_train)
+        print(y_test)
         print(predicted_target)
 
-        y_test_score = y_train[:,1]
+        y_test_score = y_test[:,1]
+
+        print(y_test_score)
 
         falses = (y_test_score == 0.0).sum();
         trues = (y_test_score == 1.0).sum();
