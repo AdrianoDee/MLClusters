@@ -346,17 +346,11 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   truesIndex  =  numpy.where(train_clusters_labels_one[:,1]==1.0)[0]
   falsesIndex =  numpy.where(train_clusters_labels_one[:,1]==0.0)[0]
 
-  print(truesIndex)
-  print(falsesIndex)
+  trueClusters = numpy.take(train_clusters,truesIndex)
+  trueLabels   = numpy.take(train_clusters_labels,truesIndex)
 
-  print(falsesIndex.size)
-  print(truesIndex.size)
-
-  trueClusters = train_clusters[truesIndex,:]
-  trueLabels   = train_clusters_labels[truesIndex,:]
-
-  falseClusters = train_clusters[falsesIndex,:]
-  falseLabels   = train_clusters_labels[falsesIndex,:]
+  falseClusters = numpy.take(train_clusters,falsesIndex)
+  falseLabels   = numpy.take(train_clusters_labels,falsesIndex)
 
   print("Read : %g true clusters and %g false clusters"%(trueLabels.size,falseLabels.size))
 
