@@ -195,7 +195,7 @@ def doublets_read_data_sets(trainsets,testsets,
 
 def doubletsReadPost(detIn,detOu,datasets,train=False,
                    dtype=dtypes.uint16,filedir='./HitsPost/',
-                   cols=8,rows=8,stack=2):
+                   cols=8,rows=8,stack=2,sanitize=False):
 
   DATASET = 'clusters'
   LABELS = 'clusterslabels'
@@ -244,22 +244,27 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
                   train_clusters = numpy.append(train_clusters,trainC,axis=0)
                   train_clusters_labels = numpy.append(train_clusters_labels,trainL,axis=0)
 
-  truesIndex  =  (train_clusters_labels==1.0)
-  falsesIndex =  (train_clusters_labels==0.0)
+  if sanitize:
+      train_clusters_labels_one = train_clusters_labels
 
-  trueClusters = numpy.extract(truesIndex, train_clusters)
-  trueLabels   = numpy.extract(truesIndex, train_clusters_labels)
+      truesIndex  =  numpy.where(train_clusters_labels_one[:,1]==1.0)[0]
+      falsesIndex =  numpy.where(train_clusters_labels_one[:,1]==0.0)[0]
+      #
+      trueClusters = train_clusters[truesIndex]
+      trueLabels   = train_clusters_labels[truesIndex]
 
-  falseClusters = numpy.extract(falsesIndex, train_clusters)
-  falseLabels   = numpy.extract(falsesIndex, train_clusters_labels)
+      falseClusters = train_clusters[falsesIndex]
+      falseLabels   = train_clusters_labels[falsesIndex]
 
-  idxs = numpy.random.randint(trueLabels.shape[0], size=falseLabels.size)
+      print("Read : %g true clusters and %g false clusters"%(trueLabels.size,falseLabels.size))
 
-  trueClusters = trueClusters[idxs, :]
-  trueLabels = trueLabels[idxs, :]
+      idxs = numpy.random.randint(trueClusters.shape[0], size=falseLabels.size)
 
-  train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
-  train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
+      trueClusters = trueClusters[idxs]
+      trueLabels = trueLabels[idxs]
+
+      train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
+      train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
 
   print("============== Reading Test Dataset in %s ============================"%(datasets))
 
@@ -271,22 +276,23 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
           test_clusters = data_clusters(f,cols,rows,stack)
           test_clusters_labels = data_clusterslabels(fl)
 
-  truesIndex  =  (test_clusters==1.0)
-  falsesIndex =  (test_clusters_labels==0.0)
+  if sanitize:
+      truesIndex  =  numpy.where(test_clusters_labels[:,1]==1.0)[0]
+      falsesIndex =  numpy.where(test_clusters_labels[:,1]==0.0)[0]
 
-  trueClustersTest = numpy.extract(truesIndex, test_clusters)
-  trueLabelsTest   = numpy.extract(truesIndex, test_clusters_labels)
+      trueClustersTest = test_clusters[truesIndex]
+      trueLabelsTest   = test_clusters_labels[truesIndex]
 
-  falseClustersTest = numpy.extract(falsesIndex, train_clusters)
-  falseLabelsTest   = numpy.extract(falsesIndex, test_clusters_labels)
+      falseClustersTest = test_clusters[falsesIndex]
+      falseLabelsTest   = test_clusters_labels[falsesIndex]
 
-  idxs = numpy.random.randint(trueLabelsTest.shape[0], size=falseLabelsTest.size)
+      idxs = numpy.random.randint(trueClustersTest.shape[0], size=falseLabelsTest.size)
 
-  trueClustersTest = trueClustersTest[idxs, :]
-  trueLabelsTest = trueLabelsTest[idxs, :]
+      trueClustersTest = trueClustersTest[idxs]
+      trueLabelsTest = trueLabelsTest[idxs]
 
-  test_clusters = numpy.append(trueClustersTest,falseClustersTest,axis=0)
-  test_clusters_labels = numpy.append(trueLabelsTest,falseLabelsTest,axis=0)
+      test_clusters = numpy.append(trueClustersTest,falseClustersTest,axis=0)
+      test_clusters_labels = numpy.append(trueLabelsTest,falseLabelsTest,axis=0)
 
   test_clusters, test_clusters_labels = shuffle(test_clusters, test_clusters_labels, random_state=0)
   train_clusters, train_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
@@ -295,7 +301,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
 
 def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
                    dtype=dtypes.uint16,filedir='./HitsPost/',
-                   cols=8,rows=8,stack=2,sanitize=false):
+                   cols=8,rows=8,stack=2,sanitize=False):
 
   DATASET = 'dets_'
   LABELS = 'dets_'
@@ -391,8 +397,8 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
       test_clusters = numpy.append(trueClustersTest,falseClustersTest,axis=0)
       test_clusters_labels = numpy.append(trueLabelsTest,falseLabelsTest,axis=0)
 
-  # test_clusters, test_clusters_labels = shuffle(test_clusters, test_clusters_labels, random_state=0)
-  # train_clusters, train_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
+  test_clusters, test_clusters_labels = shuffle(test_clusters, test_clusters_labels, random_state=0)
+  train_clusters, train_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
 
   return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
 
