@@ -31,8 +31,8 @@ from io import StringIO
 
 dIn = 0
 dOu = 1
-mIn = 192
-mOu = 176
+mIn = 144
+mOu = 80
 size = 8
 pile = 2
 #epoch = 1
@@ -56,7 +56,7 @@ epochs = [1,10,20,50]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-datas = ['0001','0002'];
+datas = ['0001','0002','0003'];
 
 (X_train, y_train), (X_test, y_test) = ku.doubletsReadPostMod(detIn=dIn,detOu=dOu,modIn=mIn,modOu=mOu,datasets=datas,filedir='./HitsPost/',cols=size,rows=size,stack=pile)
 
