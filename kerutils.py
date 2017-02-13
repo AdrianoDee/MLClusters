@@ -378,6 +378,9 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   trueClustersTest = test_clusters[truesIndex]
   trueLabelsTest   = test_clusters_labels[truesIndex]
 
+  print(trueLabelsTest)
+  print(trueClustersTest)
+
   falseClustersTest = test_clusters[falsesIndex]
   falseLabelsTest   = test_clusters_labels[falsesIndex]
 
@@ -389,8 +392,8 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   test_clusters = numpy.append(trueClustersTest,falseClustersTest,axis=0)
   test_clusters_labels = numpy.append(trueLabelsTest,falseLabelsTest,axis=0)
 
-  test_clusters, test_clusters_labels = shuffle(test_clusters, test_clusters_labels, random_state=0)
-  train_clusters, train_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
+  # test_clusters, test_clusters_labels = shuffle(test_clusters, test_clusters_labels, random_state=0)
+  # train_clusters, train_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
 
   return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
 

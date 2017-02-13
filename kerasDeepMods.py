@@ -98,12 +98,10 @@ for batchsize in batchsizes:
         #print(predicted_target)
         #print(y_test)
 
-        print(y_test)
-        print(predicted_target)
-
+        p#
         y_test_score = y_test[:,1]
 
-        print(y_test_score)
+        #print(y_test_score)
 
         falses = (y_test_score == 0.0).sum();
         trues = (y_test_score == 1.0).sum();
