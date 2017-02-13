@@ -40,7 +40,7 @@ lDel = False
 #testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
 
  #trainS = ['clusters_0_1.txt','clusterslabels0_1.txt']
-trainS = ['clusters_0_1.txt','clusterslabels0_1.txt']
+trainS = ['clusters0_1.txt','clusterslabels0_1.txt']
 testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
  #testS  = ['clusters_0_1.txt','clusterslabels0_1.txt']
 
