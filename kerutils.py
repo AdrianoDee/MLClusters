@@ -357,7 +357,7 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   idxs = numpy.random.randint(trueClusters.shape[0], size=falseLabels.size)
 
   trueClusters = trueClusters[idxs]
-  trueLabels = ntrueLabels[idxs]
+  trueLabels = trueLabels[idxs]
 
   train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
   train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
@@ -464,8 +464,8 @@ def doubletsReadPre(detIn,detOu,datasets,
 
     for bClass in AllClasses:
         idxs = numpy.random.randint(train_clusters_Class[bClass].shape[0], size=minimum)
-        train_clusters_Class[bClass] = train_clusters_Class[bClass][idxs, :]
-        train_clusters_labels_Class[bClass] = train_clusters_labels_Class[bClass][idxs, :]
+        train_clusters_Class[bClass] = train_clusters_Class[bClass][idxs]
+        train_clusters_labels_Class[bClass] = train_clusters_labels_Class[bClass][idxs]
 
     for cClass in AllClasses:
         if (train_clusters.size == 0):
@@ -515,8 +515,8 @@ def doubletsReadPre(detIn,detOu,datasets,
 
     for aClass in AllClasses:
         idxs = numpy.random.randint(test_clusters_Class[aClass].shape[0], size=minimum)
-        test_clusters_Class[aClass] = test_clusters_Class[aClass][idxs, :]
-        test_clusters_labels_Class[aClass] = test_clusters_labels_Class[aClass][idxs, :]
+        test_clusters_Class[aClass] = test_clusters_Class[aClass][idxs]
+        test_clusters_labels_Class[aClass] = test_clusters_labels_Class[aClass][idxs]
 
     for aClass in AllClasses:
         if (test_clusters.size == 0):
