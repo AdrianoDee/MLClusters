@@ -29,17 +29,20 @@ import sys
 from io import StringIO
 
 
+dIn = 0
+dOu = 1
+mIn = 144
+mOu = 80
 size = 8
 pile = 2
 #epoch = 1
-batchsize = 1000
 lDel = False
 
 #trainS = ['clusterstrain0_1.txt','clusterstrainlabels0_1.txt']
 #testS  = ['clusterstest0_1.txt','clusterstestlabels0_1.txt']
 
-trainS = ['clusters_0_1.txt','clusterslabels0_1.txt']
-testS  = ['clusters_0_1.txt','clusterslabels0_1.txt']
+# trainS = ['clusters_0_1.txt','clusterslabels0_1.txt']
+# testS  = ['clusters_0_1.txt','clusterslabels0_1.txt']
 
 # trainS = ['dets_0_1_mods_176_144train.txt','dets_0_1_mods_176_144labelstrain.txt']
 # testS  = ['dets_0_1_mods_176_144test.txt','dets_0_1_mods_176_144labelstest.txt']
@@ -47,16 +50,15 @@ testS  = ['clusters_0_1.txt','clusterslabels0_1.txt']
 #trainS = ['dets_0_1_mods_192_176train.txt','dets_0_1_mods_192_176labelstrain.txt']
 #testS  = ['dets_0_1_mods_192_176test.txt','dets_0_1_mods_192_176labelstest.txt']
 
-batchsizes = [50]
+batchsizes = [30]
 #batchsizes = [250,500,1000,10000]#,500,1000,10000]
-epochs = [1,10,20,50,100,150]
+epochs = [1,10,20,50]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-#datas = ['0001','0002','0003','0005']
-datas = ['test','test2']
+datas = ['0001','0002'];
 
-(X_train, y_train), (X_test, y_test) = ku.doublets_read_data_sets_PU(detIn=0,detOu=1,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile,neurons=4)
+(X_train, y_train), (X_test, y_test) = ku.doubletsReadPostMod(detIn=dIn,detIn=dOu,modIn=mIn,modOu=mOu,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile)
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
@@ -71,8 +73,8 @@ clustercnn.add(MaxPooling3D(pool_size=(2,2,2),border_mode='valid'))
 #clustercnn.add(MaxPooling3D(pool_size=(2,2,2),border_mode='valid'))
 clustercnn.add(Flatten())
 clustercnn.add(Dense(512, activation='relu'))
-clustercnn.add(Dropout(0.75))
-clustercnn.add(Dense(4, activation='softmax'))
+clustercnn.add(Dropout(0.25))
+clustercnn.add(Dense(2, activation='softmax'))
 #clustercnn.add(Activation('softmax'))
 #clustercnn.add(Dense(2, activation='sigmoid'))
 #clustercnn.add(Dense(1, activation='softmax'))
@@ -85,36 +87,32 @@ results = []
 
 for batchsize in batchsizes:
     for epoch in epochs:
-        print("-- Training with %g (%g epochs)"%(batchsize,epoch))
+        print('-- Training with %g (%g epochs)'%(batchsize,epoch))
         history = History()
         #early = ker.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=0, verbose=0, mode='auto')
-        history = clustercnn.fit(X_train, y_train,validation_split=0.3, nb_epoch=epoch, batch_size=batchsize,shuffle=True,verbose=0)#,callbacks=[early])
+        history = clustercnn.fit(X_train, y_train,validation_split=0.33, nb_epoch=epoch, batch_size=batchsize,shuffle=True,verbose=0)#,callbacks=[early])
 
-        predicted_target = clustercnn.predict(X_test)
-        loss_test = clustercnn.evaluate(X_test,predicted_target,batch_size=batchsize)
+        predicted_target = clustercnn.predict(X_train)
+        loss_test = clustercnn.evaluate(X_train,predicted_target,batch_size=batchsize)
         #print(predicted_target.shape())
         #print(predicted_target)
         #print(y_test)
 
-        #print(y_test)
-        #print(predicted_target)
+        print(y_train)
+        print(predicted_target)
 
-        y_test_score = y_test[:,0]
+        y_test_score = y_train[:,1]
 
         falses = (y_test_score == 0.0).sum();
         trues = (y_test_score == 1.0).sum();
 
+        print(' \n -- Testing with dataset with %g false and %g true'%(falses,trues))
 
-        print(" \n -- Testing with dataset with %g false and %g true"%(falses,trues))
+        predicted_target_score = predicted_target[:,1]
 
-        predicted_target_score = predicted_target[:,0]
-
-        print(y_test_score)
-        print(predicted_target_score)
-
-        #truePosivites = []
-        #falsePositive = []
-        #values = []
+        truePosivites = []
+        falsePositive = []
+        values = []
 
         #thresholds = np.linspace(np.amin(predicted_target_score), 1.0, num=10000)
 
@@ -126,7 +124,7 @@ for batchsize in batchsizes:
         # FalsePositives = []
 
         fpr, tpr, _ = roc_curve(y_test_score, predicted_target_score)
-        print("  - ROC Area : %g"%(auc(fpr, tpr)))
+        print('  - ROC Area : %g'%(auc(fpr, tpr)))
 
 
         # fpr, tpr, Thresholds = metrics.roc_curve(y_test_score, predicted_target_score, pos_label=2)
@@ -176,13 +174,13 @@ for batchsize in batchsizes:
         #
         #
         # # plt.plot(FalsePositives,TruePositives)
-        # # plt.savefig("mod_batch_%g_epoch_%g_trues.png"%(batchsize,epoch))
+        # # plt.savefig('mod_batch_%g_epoch_%g_trues.png'%(batchsize,epoch))
 
         TruePositives = np.asarray(tpr,dtype=np.float32)
         FalsePositives = np.asarray(fpr,dtype=np.float32)
 
-        truesPath = trainS[0][:-4] + "mod_batch_" + str(batchsize) + "epoch" + str(epoch) + "_trues.out"
-        falsesPath = trainS[0][:-4] + "mod_batch_" + str(batchsize) + "epoch" + str(epoch) + "_falses.out"
+        truesPath = './outputs/dets_' + str(dIn) + '_' + str(dOu) + '_mods_' + str(mIn) + '_' + str(mOu) + '_batch_' + str(batchsize) + 'epoch' + str(epoch) + '_trues.out'
+        falsesPath = './outputs/dets_' + str(dIn) + '_' + str(dOu) + '_mods_' + str(mIn) + '_' + str(mOu) + '_batch_' + str(batchsize) + 'epoch' + str(epoch) + '_falses.out'
 
         np.savetxt(truesPath,(TruePositives))
         np.savetxt(falsesPath,(FalsePositives))
@@ -190,20 +188,21 @@ for batchsize in batchsizes:
         result = (epochs,batchsize,history.history['acc'],history.history['loss'],history.history['val_loss'],history.history['val_acc'],TruePositives,FalsePositives)
         results.append(result)
 
-filePKName = trainS[0][:-4] + ".pik"
+filePKName = './outputs/dets' + str(dIn) + '_' + str(dOu) + '_mods_' + str(mIn) + '_' + str(mOu) + '_batch_' + str(batchsize) + 'epoch' + str(epoch) + '.pik'
+
 with open(filePKName, 'wb') as f:
   pickle.dump(results, f, -1)
-        #np.savetxt("mod_batch_%g_epoch_%g_thresh.out"%(batchsize,epoch),(thresholds))
+        #np.savetxt('mod_batch_%g_epoch_%g_thresh.out'%(batchsize,epoch),(thresholds))
 
-        #print("  - ROC Area  = %g "%(auc(FalsePositives,TruePositives)))
+        #print('  - ROC Area  = %g '%(auc(FalsePositives,TruePositives)))
 
 
 
-              #plt.savefig("trueFalse.png")
+              #plt.savefig('trueFalse.png')
 
               #plt.figure(2)
               #plt.plot(truePosivites,thresholds)
-              #plt.savefig("threshs.png")
+              #plt.savefig('threshs.png')
 
               #for i in range(len(histories)):
               #      nn_graphics.show_losses(histories[i])
@@ -218,11 +217,11 @@ with open(filePKName, 'wb') as f:
               #summarize history for loss
               #print(clustercnn.summary())
 
-              #print("Threshold %g \n TruePositive %g \n FalsePositive %g \n TrueNegative %g \n FalseNegative %g"%(thresholds[i],TruePositive,FalsePositive,TrueNegative,FalseNegative))
+              #print('Threshold %g \n TruePositive %g \n FalsePositive %g \n TrueNegative %g \n FalseNegative %g'%(thresholds[i],TruePositive,FalsePositive,TrueNegative,FalseNegative))
 
               #predicted_target_score_thr[low_values_indices] = 0.0
               #predicted_target_score_thr[high_values_indices] = 1.0
-              #print("Threshold %g Ones %g zeros %g "%(thresholds[i],(predicted_target_score <= thresholds[i]).sum(),(predicted_target_score >= thresholds[i]).sum()))
+              #print('Threshold %g Ones %g zeros %g '%(thresholds[i],(predicted_target_score <= thresholds[i]).sum(),(predicted_target_score >= thresholds[i]).sum()))
               #print(low_values_indices)
               #print(high_values_indices)
               #TruePositive, FalsePositive, TrueNegative, FalseNegative = ku.accuracy_measure(y_test_score, predicted_target_score_thr)

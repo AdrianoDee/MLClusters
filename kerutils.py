@@ -193,11 +193,210 @@ def doublets_read_data_sets(trainsets,testsets,
   return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
 
 
-def doublets_read_data_sets_PU(detIn,detOu,datasets,
-    dtype=dtypes.uint16,filedir='./Hits/',
-    reshape=True,cols=8,rows=8,stack=2,neurons=2):
+def doubletsReadPost(detIn,detOu,datasets,train=false,
+                   dtype=dtypes.uint16,filedir='./HitsPost/',
+                   cols=8,rows=8,stack=2):
 
-    DATASET = 'clusters_' + str(detIn) + '_' + str(detOu) + '.txt'
+  DATASET = 'clusters'
+  LABELS = 'clusterslabels'
+
+  if detIn >= 0 and detOu >= 0:
+      if train:
+          DATASET += 'train' + str(detIn) + '_' + str(detOu) + '.txt'
+          LABELS += 'train' + str(detIn) + '_' + str(detOu) + '.txt'
+      else:
+          DATASET += str(detIn) + '_' + str(detOu) + '.txt'
+          LABELS += str(detIn) + '_' + str(detOu) + '.txt'
+  else:
+      DATASET += 'total.txt'
+      LABELS += 'total.txt'
+
+  testId = numpy.random.random_integers(len(datasets)-1)
+  test_dir = datasets[testId]
+  datasets = numpy.delete(datasets,testId,0)
+  numpy.random.shuffle(datasets)
+
+  print(" - Train Dasets : ")
+  print(datasets)
+  print(" - Test Dataset : ")
+  print(test_dir)
+
+  train_clusters = numpy.array([])
+  train_clusters_labels = numpy.array([])
+  test_clusters = numpy.array([])
+  test_clusters_labels = numpy.array([])
+
+  for data in datasets:
+      print("============== Reading Train datasets in %s ============================"%(datasets))
+
+      data_file = os.path.join(filedir + data, DATASET)
+      labels_file = os.path.join(filedir + data, LABELS)
+
+      with open(data_file, 'rb') as f and open(labels_file, 'rb') as fl:
+          trainC = data_clusters(f,cols,rows,stack)
+          trainL = data_clusterslabels(fl)
+
+          if(train_clusters.size == 0):
+              train_clusters = trainC
+              train_clusters_labels = trainL
+          else:
+              train_clusters = numpy.append(train_clusters,trainC,axis=0)
+              train_clusters_labels = numpy.append(trainL,trainC,axis=0)
+
+  truesIndex  =  (train_clusters_labels==1.0)
+  falsesIndex =  (train_clusters_labels==0.0)
+
+  trueClusters = numpy.extract(truesIndex, train_clusters)
+  trueLabels   = numpy.extract(truesIndex, train_clusters_labels)
+
+  falseClusters = numpy.extract(falsesIndex, train_clusters)
+  falseLabels   = numpy.extract(falsesIndex, train_clusters_labels)
+
+  idxs = numpy.random.randint(trueLabels.shape[0], size=falseLabels.size)
+
+  trueClusters = trueClusters[idxs, :]
+  trueLabels = trueLabels[idxs, :]
+
+  train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
+  train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
+
+  print("============== Reading Test Dataset in %s ============================"%(datasets))
+
+  data_file_test = os.path.join(filedir + test_dir, DATASET)
+  labels_file_test = os.path.join(filedir + test_dir, LABELS)
+
+  with open(data_file, 'rb') as f and open(labels_file, 'rb') as fl:
+      test_clusters = data_clusters(f,cols,rows,stack)
+      test_clusters_labels = data_clusterslabels(fl)
+
+  truesIndex  =  (test_clusters==1.0)
+  falsesIndex =  (test_clusters_labels==0.0)
+
+  trueClustersTest = numpy.extract(truesIndex, test_clusters)
+  trueLabelsTest   = numpy.extract(truesIndex, test_clusters_labels)
+
+  falseClustersTest = numpy.extract(falsesIndex, train_clusters)
+  falseLabelsTest   = numpy.extract(falsesIndex, test_clusters_labels)
+
+  idxs = numpy.random.randint(trueLabelsTest.shape[0], size=falseLabelsTest.size)
+
+  trueClustersTest = trueClustersTest[idxs, :]
+  trueLabelsTest = trueLabelsTest[idxs, :]
+
+  test_clusters = numpy.append(trueClustersTest,falseClustersTest,axis=0)
+  test_clusters_labels = numpy.append(trueLabelsTest,falseLabelsTest,axis=0)
+
+  test_clusters, test_clusters_labels = shuffle(test_clusters, test_clusters_labels, random_state=0)
+  train_clusters, train_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
+
+  return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
+
+def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=false,
+                   dtype=dtypes.uint16,filedir='./HitsPost/',
+                   cols=8,rows=8,stack=2):
+
+  DATASET = 'dets_'
+  LABELS = 'dets_'
+
+  if train:
+      DATASET += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modIn) + '.txt'
+      LABELS += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modIn) +  'labels.txt'
+  else:
+      DATASET += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modIn) + '.txt'
+      LABELS += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modIn) +  'labels.txt'
+
+
+  testId = numpy.random.random_integers(len(datasets)-1)
+  test_dir = datasets[testId]
+  datasets = numpy.delete(datasets,testId,0)
+  numpy.random.shuffle(datasets)
+
+  print(" - Train Dasets : ")
+  print(datasets)
+  print(" - Test Dataset : ")
+  print(test_dir)
+
+  train_clusters = numpy.array([])
+  train_clusters_labels = numpy.array([])
+  test_clusters = numpy.array([])
+  test_clusters_labels = numpy.array([])
+
+  for data in datasets:
+      print("============== Reading Train datasets in %s ============================"%(datasets))
+
+      data_file = os.path.join(filedir + data, DATASET)
+      labels_file = os.path.join(filedir + data, LABELS)
+
+      with open(data_file, 'rb') as f and open(labels_file, 'rb') as fl:
+          trainC = data_clusters(f,cols,rows,stack)
+          trainL = data_clusterslabels(fl)
+
+          if(train_clusters.size == 0):
+              train_clusters = trainC
+              train_clusters_labels = trainL
+          else:
+              train_clusters = numpy.append(train_clusters,trainC,axis=0)
+              train_clusters_labels = numpy.append(trainL,trainC,axis=0)
+
+  truesIndex  =  (train_clusters_labels==1.0)
+  falsesIndex =  (train_clusters_labels==0.0)
+
+  trueClusters = numpy.extract(truesIndex, train_clusters)
+  trueLabels   = numpy.extract(truesIndex, train_clusters_labels)
+
+  falseClusters = numpy.extract(falsesIndex, train_clusters)
+  falseLabels   = numpy.extract(falsesIndex, train_clusters_labels)
+
+  idxs = numpy.random.randint(trueLabels.shape[0], size=falseLabels.size)
+
+  trueClusters = trueClusters[idxs, :]
+  trueLabels = trueLabels[idxs, :]
+
+  train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
+  train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
+
+  print("============== Reading Test Dataset in %s ============================"%(datasets))
+
+  data_file_test = os.path.join(filedir + test_dir, DATASET)
+  labels_file_test = os.path.join(filedir + test_dir, LABELS)
+
+  with open(data_file, 'rb') as f and open(labels_file, 'rb') as fl:
+      test_clusters = data_clusters(f,cols,rows,stack)
+      test_clusters_labels = data_clusterslabels(fl)
+
+  truesIndex  =  (test_clusters==1.0)
+  falsesIndex =  (test_clusters_labels==0.0)
+
+  trueClustersTest = numpy.extract(truesIndex, test_clusters)
+  trueLabelsTest   = numpy.extract(truesIndex, test_clusters_labels)
+
+  falseClustersTest = numpy.extract(falsesIndex, train_clusters)
+  falseLabelsTest   = numpy.extract(falsesIndex, test_clusters_labels)
+
+  idxs = numpy.random.randint(trueLabelsTest.shape[0], size=falseLabelsTest.size)
+
+  trueClustersTest = trueClustersTest[idxs, :]
+  trueLabelsTest = trueLabelsTest[idxs, :]
+
+  test_clusters = numpy.append(trueClustersTest,falseClustersTest,axis=0)
+  test_clusters_labels = numpy.append(trueLabelsTest,falseLabelsTest,axis=0)
+
+  test_clusters, test_clusters_labels = shuffle(test_clusters, test_clusters_labels, random_state=0)
+  train_clusters, train_clusters_labels = shuffle(train_clusters, train_clusters_labels, random_state=0)
+
+  return (train_clusters, train_clusters_labels), (test_clusters, test_clusters_labels)
+
+
+def doubletsReadPre(detIn,detOu,datasets,
+    dtype=dtypes.uint16,filedir='./HitsPre/',
+    cols=8,rows=8,stack=2,neurons=2):
+
+    DATASET = 'clusters_'
+
+    if detIn >= 0 and detOu >= 0:
+        DATASET += str(detIn) + '_' + str(detOu) + '.txt'
+    else:
+        DATASET += 'Pre.txt'
 
     #Pick up randomly a test dataset
     #testId = 0
