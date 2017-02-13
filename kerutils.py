@@ -260,7 +260,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
 
       idxs = numpy.random.randint(trueClusters.shape[0], size=falseLabels.shape[0])
 
-      trueClusters = trueClustersF[idxs]
+      trueClusters = trueClusters[idxs]
 
       print(trueClusters.shape[0])
       trueLabels = trueLabels[idxs]
