@@ -58,7 +58,7 @@ epochs = [1,10,20,50]
 
 datas = ['0001','0002'];
 
-(X_train, y_train), (X_test, y_test) = ku.doubletsReadPostMod(detIn=dIn,detIn=dOu,modIn=mIn,modOu=mOu,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile)
+(X_train, y_train), (X_test, y_test) = ku.doubletsReadPostMod(detIn=dIn,detOu=dOu,modIn=mIn,modOu=mOu,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile)
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
