@@ -303,7 +303,7 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   if train:
       DATASET += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) + '.txt'
       LABELS += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) +  'labels.txt'
-  else: 
+  else:
       DATASET += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) + '.txt'
       LABELS += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) +  'labels.txt'
 
@@ -350,6 +350,7 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   falseClusters = numpy.extract(falsesIndex, train_clusters)
   falseLabels   = numpy.extract(falsesIndex, train_clusters_labels)
 
+  print("Read : %g true clusters and %g false clusters"%(trueLabels.shape[0],falseLabels.shape[0]))
   idxs = numpy.random.randint(trueLabels.shape[0], size=falseLabels.size)
 
   trueClusters = trueClusters[idxs, :]
