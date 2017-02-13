@@ -303,7 +303,7 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   if train:
       DATASET += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) + '.txt'
       LABELS += 'train' + str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) +  'labels.txt'
-  elsemodOu
+  else: 
       DATASET += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) + '.txt'
       LABELS += str(detIn) + '_' + str(detOu) + '_mods_' + str(modIn)  + '_' + str(modOu) +  'labels.txt'
 
