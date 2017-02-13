@@ -378,9 +378,6 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   trueClustersTest = test_clusters[truesIndex]
   trueLabelsTest   = test_clusters_labels[truesIndex]
 
-  print(trueLabelsTest)
-  print(trueClustersTest)
-
   falseClustersTest = test_clusters[falsesIndex]
   falseLabelsTest   = test_clusters_labels[falsesIndex]
 

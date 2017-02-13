@@ -31,8 +31,8 @@ from io import StringIO
 
 dIn = 0
 dOu = 1
-mIn = 144
-mOu = 80
+mIn = 192
+mOu = 176
 size = 8
 pile = 2
 #epoch = 1
@@ -98,7 +98,9 @@ for batchsize in batchsizes:
         #print(predicted_target)
         #print(y_test)
 
-        p#
+        # print(y_test)
+        # print(predicted_target)
+
         y_test_score = y_test[:,1]
 
         #print(y_test_score)
