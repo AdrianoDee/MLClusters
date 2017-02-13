@@ -355,7 +355,8 @@ def doubletsReadPostMod(detIn,detOu,modIn,modOu,datasets,train=False,
   idxs = numpy.random.randint(falseClusters.shape[0], size=10)
 
   print(idxs)
-  print(trueClusters.shape[0])
+  print(trueClusters)
+
   trueClustersF = trueClusters[idxs, :]
   trueLabelsF = trueLabels[idxs, :]
 
