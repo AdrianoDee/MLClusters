@@ -96,9 +96,6 @@ for batchsize in batchsizes:
         #print(predicted_target)
         #print(y_test)
 
-        print(y_train)
-        print(predicted_target)
-
         y_test_score = y_train[:,1]
 
         falses = (y_test_score == 0.0).sum();
