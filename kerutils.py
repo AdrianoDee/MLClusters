@@ -266,7 +266,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
       train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
       train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
 
-  print("============== Reading Test Dataset in %s ============================"%(datasets))
+  print("============== Reading Test Dataset in %s ============================"%(test_dir))
 
   data_file_test = os.path.join(filedir + test_dir, DATASET)
   labels_file_test = os.path.join(filedir + test_dir, LABELS)
