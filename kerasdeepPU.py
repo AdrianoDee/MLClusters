@@ -56,7 +56,7 @@ epochs = [1,10,20,50,100,150]
 datas = ['0001','0002','0003','0004','0005']
 #datas = ['test','test2']
 
-(X_train, y_train), (X_test, y_test) = ku.doubletsReadPre(detIn=0,detOu=1,datasets=datas,filedir='./Hits/',cols=size,rows=size,stack=pile,neurons=4)
+(X_train, y_train), (X_test, y_test) = ku.doubletsReadPre(detIn=0,detOu=1,datasets=datas,filedir='./HitsPre/',cols=size,rows=size,stack=pile,neurons=4)
 
 clustercnn = Sequential()
 #clustercnn.add(Convolution2D(64,3,1,input_shape = (8,8,2), activation = 'sigmoid',border_mode='valid'))
