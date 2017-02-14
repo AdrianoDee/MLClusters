@@ -269,15 +269,15 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
   #     train_clusters = numpy.append(trueClusters,falseClusters,axis=0)
   #     train_clusters_labels  = numpy.append(trueLabels,falseLabels,axis=0)
   #
-  # print("============== Reading Test Dataset in %s ============================"%(test_dir))
-  #
-  # data_file_test = os.path.join(filedir + test_dir, DATASET)
-  # labels_file_test = os.path.join(filedir + test_dir, LABELS)
-  #
-  # with open(data_file_test, 'rb') as f:
-  #     with open(labels_file_test, 'rb') as fl:
-  #         test_clusters = data_clusters(f,cols,rows,stack)
-  #         test_clusters_labels = data_clusterslabels(fl)
+  print("============== Reading Test Dataset in %s ============================"%(test_dir))
+
+  data_file_test = os.path.join(filedir + test_dir, DATASET)
+  labels_file_test = os.path.join(filedir + test_dir, LABELS)
+
+  with open(data_file_test, 'rb') as f:
+      with open(labels_file_test, 'rb') as fl:
+          test_clusters = data_clusters(f,cols,rows,stack)
+          test_clusters_labels = data_clusterslabels(fl)
   #
   # if sanitize:
   #     truesIndex  =  numpy.where(test_clusters_labels[:,1]==1.0)[0]
