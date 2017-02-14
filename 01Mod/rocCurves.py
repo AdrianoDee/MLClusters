@@ -20,6 +20,7 @@ collection = []
 
 for i in range(len(falsePaths)):
     with open("./false/" + falsePaths[i], 'rb') as f:
+        #print(falsePaths[i])
         falses = np.loadtxt(f,delimiter='\n',dtype = np.float32)
 
     with open("./true/" + truesPaths[i], 'rb') as f:
