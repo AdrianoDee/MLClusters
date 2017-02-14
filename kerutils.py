@@ -226,6 +226,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
   # train_clusters_labels = numpy.array([])
   # test_clusters = numpy.array([])
   # test_clusters_labels = numpy.array([])
+  filecounter = 0
 
   for data in datasets:
       print("============== Reading Train datasets in %s ============================"%(datasets))
@@ -235,10 +236,11 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
 
       with open(data_file, 'rb') as f:
           with open(labels_file, 'rb') as fl:
+              filecounter = filecounter + 1
               trainC = data_clusters(f,cols,rows,stack)
               trainL = data_clusterslabels(fl)
 
-              if(train_clusters.size == 0):
+              if(filecounter == 1):
                   train_clusters = trainC
                   train_clusters_labels = trainL
               else:
@@ -273,7 +275,7 @@ def doubletsReadPost(detIn,detOu,datasets,train=False,
 
   data_file_test = os.path.join(filedir + test_dir, DATASET)
   labels_file_test = os.path.join(filedir + test_dir, LABELS)
-
+  
   with open(data_file_test, 'rb') as f:
       with open(labels_file_test, 'rb') as fl:
           test_clusters = data_clusters(f,cols,rows,stack)
