@@ -50,13 +50,13 @@ lDel = False
 #trainS = ['dets_0_1_mods_192_176train.txt','dets_0_1_mods_192_176labelstrain.txt']
 #testS  = ['dets_0_1_mods_192_176test.txt','dets_0_1_mods_192_176labelstest.txt']
 
-batchsizes = [30]
+batchsizes = [10,20,50,100,500]
 #batchsizes = [250,500,1000,10000]#,500,1000,10000]
-epochs = [1,10,20,50]
+epochs = [1,10,20,50,100,500,1000]
 
 #(X_train, y_train) = ku.doublets_read_data_sets_PU(trainsets=trainS,testsets=testS,train_dir='./Hits/datasets/',cols=size,rows=size,stack=pile)
 
-datas = ['0001','0002','0003'];
+datas = ['0001','0004','0002','0003'];
 
 (X_train, y_train), (X_test, y_test) = ku.doubletsReadPostMod(detIn=dIn,detOu=dOu,modIn=mIn,modOu=mOu,datasets=datas,filedir='./HitsPost/',cols=size,rows=size,stack=pile)
 
@@ -73,7 +73,7 @@ clustercnn.add(MaxPooling3D(pool_size=(2,2,2),border_mode='valid'))
 #clustercnn.add(MaxPooling3D(pool_size=(2,2,2),border_mode='valid'))
 clustercnn.add(Flatten())
 clustercnn.add(Dense(512, activation='relu'))
-clustercnn.add(Dropout(0.25))
+clustercnn.add(Dropout(0.7))
 clustercnn.add(Dense(2, activation='softmax'))
 #clustercnn.add(Activation('softmax'))
 #clustercnn.add(Dense(2, activation='sigmoid'))
