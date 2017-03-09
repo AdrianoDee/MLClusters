@@ -52,7 +52,7 @@ clustercnn.add(Dense(512, activation='sigmoid'))
 clustercnn.add(Dropout(0.5))
 clustercnn.add(Dense(numlabels, activation='softmax'))
 clustercnn.compile(loss='binary_crossentropy',optimizer='sgd', metrics=['accuracy'])
-early = k.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=2, verbose=0, mode='auto')
+early = k.callbacks.EarlyStopping(monitor='val_loss', patience=2, verbose=0, mode='auto')
 history = clustercnn.fit(data_train, label_train,validation_split=0.33, nb_epoch=epoch, batch_size=batchsize,shuffle=True,callbacks=[early])
 predicted_target = clustercnn.predict(data_train)
 

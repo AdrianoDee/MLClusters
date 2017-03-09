@@ -310,14 +310,12 @@ def clustersInput(alldata,cols=8,rows=8,dropEdge=True,dropBad=True,dropBig=True,
 
     # print(alldata[:,-7:])
 
-
-    print(infos+1)
     alldata = alldata.reshape(nclusts,2*rows*cols+infos)
 
     cltdata = alldata[:,datadict["inPix1"]:datadict["evtNum"]]
     cltdata = np.multiply(cltdata, 1.0 / 65535.0)
     infdata = np.append(alldata[:,0:datadict["inPix1"]],alldata[:,datadict["evtNum"]:],axis=1)
-    print(infdata.shape)
+
     labels = neuronLabels(infdata)
     cltdata=cltdata.reshape(nclusts,rows,cols,2,1)
     #labdata = clustersLabel(infdata)
