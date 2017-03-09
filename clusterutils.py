@@ -167,7 +167,7 @@ def labelsToNeurons(labels, num_classes):
 def datasetload(path='./datasets/',delimit='\t',fileslimit =-1,writetohd = False,type=""):
 
     datafiles = np.array([f for f in listdir(path) if (isfile(join(path, f)) and  f.lower().endswith(('.txt',".gz")))])
-    print(fileslimit)
+
     if fileslimit > 0:
         datafiles = datafiles[:fileslimit]
 
