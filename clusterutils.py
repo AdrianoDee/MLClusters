@@ -6,6 +6,7 @@ import sys
 import numpy as np
 import gzip
 import random
+import h5py as h5
 
 np.set_printoptions(threshold=np.nan)
 
@@ -163,10 +164,10 @@ def labelsToNeurons(labels, num_classes):
 
   return neurons
 
-def datasetload(path='./datasets/',delimit='\t',fileslimit =-1):
+def datasetload(path='./datasets/',delimit='\t',fileslimit =-1,writetohd = False,type=""):
 
-    datafiles = np.array([f for f in listdir(path) if isfile(join(path, f))])
-
+    datafiles = np.array([f for f in listdir(path) if (isfile(join(path, f)) and  f.lower().endswith(('.txt',".zip")))])
+    print(fileslimit)
     if fileslimit > 0:
         datafiles = datafiles[:fileslimit]
 
@@ -174,13 +175,24 @@ def datasetload(path='./datasets/',delimit='\t',fileslimit =-1):
 
     datasets  = []
     for filename in datafiles:
-        with open(path  + filename, 'rb') as f:
-            print ("Reading clusters from ",f.name)
-            f.seek(0)
-            data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
-            datasets.append(data)
+        if filename.lower().endswith('.txt'):
+            with open(path + filename, 'rb') as f:
+                print ("Reading clusters from txt :",f.name)
+                f.seek(0)
+                data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
+                datasets.append(data)
+
+        if filename.lower().endswith('.zip'):
+            with gzip.open(path + filename, 'rb') as f:
+                print ("Reading clusters from zip :",f.name)
+                f.seek(0)
+                data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
+                datasets.append(data)
 
     data = np.vstack(datasets)
+
+    if writetohd:
+        print()
 
     return data
 
@@ -248,11 +260,11 @@ def datafiltering(filters,alldata,savetoh=False,shuffle=False,sanitize=False,san
 
             #ASSUMING FAKES ALWAYS > TRUES
             if(trues.shape[0]/oldsize>sanratio):
-                idx = np.random.randint(trues.shape[0], size=sanratio*oldsize)
+                idx = np.random.randint(int(trues.shape[0]), size=int(sanratio*oldsize))
                 trues = trues[idx,:]
             else:
                 newsize = trues.shape[0]/sanratio
-                idx = np.random.randint(trues.shape[0], size=(1.0-sanratio)*newsize)
+                idx = np.random.randint(int(trues.shape[0]), size=int((1.0-sanratio)*newsize))
                 fakes = fakes[idx,:]
 
             data = np.vstack((trues,fakes))

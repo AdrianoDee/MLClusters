@@ -30,7 +30,7 @@ from io import StringIO
 sanitize = False
 filters = {}
 batchsize = 50
-epoch = 5
+epoch = 100
 
 size = 8
 
@@ -40,7 +40,7 @@ lDel = False
 batchsize=30
 
 
-data    = cu.datasetload(fileslimit=2)
+data    = cu.datasetload(fileslimit=10)
 filters = {"detCounterIn":[0.],"detCounterOut":[1.],"Zvertex" : [-10.0,1.0]}
 datafil = cu.datafiltering(filters,data,sanitize=True,sanratio=0.5)
 (data_train, label_train) = cu.clustersInput(datafil)
@@ -52,10 +52,15 @@ clustercnn.add(Dense(512, activation='sigmoid'))
 clustercnn.add(Dropout(0.5))
 clustercnn.add(Dense(numlabels, activation='softmax'))
 clustercnn.compile(loss='binary_crossentropy',optimizer='sgd', metrics=['accuracy'])
-early = k.callbacks.EarlyStopping(monitor='val_loss', patience=2, verbose=0, mode='auto')
+early = k.callbacks.EarlyStopping(monitor='val_acc', patience=4, verbose=1, mode='auto')
 history = clustercnn.fit(data_train, label_train,validation_split=0.33, nb_epoch=epoch, batch_size=batchsize,shuffle=True,callbacks=[early])
 predicted_target = clustercnn.predict(data_train)
 
+label_score = label_train[:,0]
+preds_score = predicted_target[:,0]
+
+fpr, tpr, _ = roc_curve(label_score, preds_score)
+print("  - ROC Area : %g"%(auc(fpr, tpr)))
 
 #
 # with open("filePKName", 'wb') as f:
