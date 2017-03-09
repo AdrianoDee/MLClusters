@@ -269,34 +269,49 @@ def datafiltering(filters,alldata,savetoh=False,shuffle=False,sanitize=False,san
 
         return alldata
 
-def clustersInput(alldata,cols=8,rows=8,infos=61,dropEdge=True,dropBad=True,dropBig=True,dropCosmic=True,dropCharge=True):
+def clustersInput(alldata,cols=8,rows=8,dropEdge=True,dropBad=True,dropBig=True,dropCosmic=True,dropCharge=True):
 
-    sizedat = 2*rows*cols+infos
     nclusts = alldata.shape[0]
 
-    print(alldata.shape)
+    infos=(alldata.shape[1]-2*rows*cols)
 
     if dropEdge:
         print("Dropping clusters with pixels on edge . . .")
         alldata = alldata[alldata[:,datadict["isEdgIn"]]==float(False)]
         alldata = alldata[alldata[:,datadict["isEdgOut"]]==float(False)]
+        print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
+        nclusts = alldata.shape[0]
+
     if dropBig:
         print("Dropping clusters with big pixels . . .")
         alldata = alldata[alldata[:,datadict["isBigIn"]]==float(False)]
         alldata = alldata[alldata[:,datadict["isBigOut"]]==float(False)]
+        print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
+        nclusts = alldata.shape[0]
+
     if dropBad:
         print("Dropping clusters with bad pixels . . .")
         alldata = alldata[alldata[:,datadict["isBadIn"]]==float(False)]
         alldata = alldata[alldata[:,datadict["isBadOut"]]==float(False)]
+        print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
+        nclusts = alldata.shape[0]
+
     if dropCosmic:
         print("Dropping clusters from cosmics . . .")
         alldata = alldata[alldata[:,datadict["isCosmic"]]==float(False)]
+        print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
+        nclusts = alldata.shape[0]
+
     if dropCharge:
         print("Dropping clusters from not qMatched tracks . . .")
-        alldata = alldata[alldata[:,datadict["chargeMatch"]]==float(True)]
+        alldata = alldata[alldata[:,datadict["chargeMatch"]]==float(False)]
+        print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
+        nclusts = alldata.shape[0]
 
     # print(alldata[:,-7:])
 
+
+    print(infos+1)
     alldata = alldata.reshape(nclusts,2*rows*cols+infos)
 
     cltdata = alldata[:,datadict["inPix1"]:datadict["evtNum"]]

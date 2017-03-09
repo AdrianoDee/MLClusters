@@ -40,7 +40,7 @@ lDel = False
 batchsize=30
 
 
-data    = cu.datasetload(fileslimit=1)
+data    = cu.datasetload(fileslimit=2)
 filters = {"detCounterIn":[0.],"detCounterOut":[1.],"Zvertex" : [-10.0,1.0]}
 datafil = cu.datafiltering(filters,data,sanitize=True,sanratio=0.5)
 (data_train, label_train) = cu.clustersInput(datafil)
