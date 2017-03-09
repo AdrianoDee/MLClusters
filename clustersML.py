@@ -27,17 +27,22 @@ import sys
 
 from io import StringIO
 
+sanitize = False
+filters = {}
+batchsize = 50
+epoch = 5
 
 size = 8
-pile = 2
+
 numlabels=17
-epoch = 5
+
 lDel = False
 batchsize=30
 
+
 data    = cu.datasetload(fileslimit=1)
-filters = {"detCounterIn":[0.],"detCounterOut":[1.]}
-datafil = cu.datafiltering(filters,data)
+filters = {"detCounterIn":[0.],"detCounterOut":[1.],"Zvertex" : [-10.0,1.0]}
+datafil = cu.datafiltering(filters,data,sanitize=True,sanratio=0.5)
 (data_train, label_train) = cu.clustersInput(datafil)
 clustercnn = Sequential()
 clustercnn.add(Convolution3D(32,4,4,1,input_shape = (8,8,2,1), activation = 'sigmoid',border_mode='valid'))
