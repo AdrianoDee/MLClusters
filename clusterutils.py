@@ -166,7 +166,7 @@ def labelsToNeurons(labels, num_classes):
 
 def datasetload(path='./datasets/',delimit='\t',fileslimit =-1,writetohd = False,type=""):
 
-    datafiles = np.array([f for f in listdir(path) if (isfile(join(path, f)) and  f.lower().endswith(('.txt',".zip")))])
+    datafiles = np.array([f for f in listdir(path) if (isfile(join(path, f)) and  f.lower().endswith(('.txt',".gz")))])
     print(fileslimit)
     if fileslimit > 0:
         datafiles = datafiles[:fileslimit]
@@ -182,7 +182,7 @@ def datasetload(path='./datasets/',delimit='\t',fileslimit =-1,writetohd = False
                 data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
                 datasets.append(data)
 
-        if filename.lower().endswith('.zip'):
+        if filename.lower().endswith('.gz'):
             with gzip.open(path + filename, 'rb') as f:
                 print ("Reading clusters from zip :",f.name)
                 f.seek(0)
