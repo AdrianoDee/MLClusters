@@ -251,7 +251,8 @@ def datafiltering(filters,alldata,savetoh=False,shuffle=False,sanitize=False,san
                 idx = np.random.randint(trues.shape[0], size=sanratio*oldsize)
                 trues = trues[idx,:]
             else:
-                idx = np.random.randint(trues.shape[0], size=(1.0-sanratio)*oldsize)
+                newsize = trues.shape[0]/sanratio
+                idx = np.random.randint(trues.shape[0], size=(1.0-sanratio)*newsize)
                 fakes = fakes[idx,:]
 
             data = np.vstack((trues,fakes))
