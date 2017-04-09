@@ -24,6 +24,8 @@ from os.path import isfile, join
 from tensorflow.contrib.learn.python.learn.datasets import base
 from tensorflow.python.framework import dtypes
 
+import time
+
 
 def etalabel(eta):
 
@@ -53,7 +55,7 @@ datalabs = ["run","evt","detSeqIn","detSeqOut","inZ","inX","inY","outZ",
 "outX","outY","detCounterIn","detCounterOut","isBarrelIn","isBarrelOut",
 "layerIn","ladderIn","moduleIn","sideIn","diskIn","panelIn","bladeIn",
 "layerOut","ladderOut","moduleOut","sideOut","diskOut","panelOut","bladeOut",
-"inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut",##"isFlippedIn","isFlippedOut",
+"inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut",#"isFlippedIn","isFlippedOut",
 "inPix1","inPix2","inPix3","inPix4","inPix5","inPix6","inPix7","inPix8",
 "inPix9","inPix10","inPix11","inPix12","inPix13","inPix14","inPix15","inPix16",
 "inPix17","inPix18","inPix19","inPix20","inPix21","inPix22","inPix23","inPix24",
@@ -79,7 +81,7 @@ infolabs = ["run","evt","detSeqIn","detSeqOut","inZ","inX","inY",
 "outZ","outX","outY","detCounterIn","detCounterOut","isBarrelIn","isBarrelOut",
 "layerIn","ladderIn","moduleIn","sideIn","diskIn","panelIn","bladeIn",
 "layerOut","ladderOut","moduleOut","sideOut","diskOut","panelOut","bladeOut",
-"inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut",##"isFlippedIn","isFlippedOut",
+"inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut",#"isFlippedIn","isFlippedOut",
 "dummyFlag","idTrack","px","py","pz","pt","mT","eT","mSqr","rapidity","etaTrack","phi",
 "pdgId","charge","noTrackerHits","noTrackerLayers","dZ","dXY","Xvertex",
 "Yvertex","Zvertex","bunCross","isCosmic","chargeMatch","sigMatch"]
@@ -180,7 +182,7 @@ def labelsToNeurons(labels, num_classes):
 
   return neurons
 
-def datastats(data,printstat=False):
+def datastats(data,printstat=False,mode="ladder"):
 
     anylabs = ["run","evt","detSeqIn","detSeqOut","inX","inY","inZ",
     "outX","outY","outZ","detCounterIn","detCounterOut","isBarrelIn","isBarrelOut",
@@ -189,12 +191,31 @@ def datastats(data,printstat=False):
     "inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut",
     "dummyFlag"]
 
+    if mode=="ladder":
+        r = np.r_[datadict["detCounterIn"]:datadict["moduleIn"],[datadict["layerOut"],datadict["ladderOut"]]]
+    else:
+        if mode=="disk":
+            r = np.r_[datadict["detCounterIn"]:datadict["ladderIn"],[datadict["diskIn"],datadict["layerOut"],datadict["diskOut"]]]
+        else:
+            if mode=="ladderdisk":
+                r = np.r_[datadict["detCounterIn"]:datadict["moduleIn"],[datadict["layerOut"],datadict["diskOut"]]]
+            else:
+                print("Not proper mode selected (ladder,disk,diskladder,ladderdisk). Autoselect: ladder.")
+                mode="ladder"
+                r = np.r_[datadict["detCounterIn"]:datadict["moduleIn"],[datadict["layerOut"],datadict["ladderOut"]]]
 
-    r = np.r_[datadict["detCounterIn"]:datadict["moduleIn"],[datadict["layerOut"],datadict["layerOut"],datadict["ladderOut"]]]
     datadets = data[:,r]
 
     detslabs = np.array(datalabs)[r]
-    datadets = datadets[np.logical_and(datadets[:,2]==1.0 , datadets[:,3]==1.0)]
+    if mode=="ladder":
+        datadets = datadets[np.logical_and(datadets[:,2]==1.0 , datadets[:,3]==1.0)]
+    else:
+        if mode=="disk":
+            datadets = datadets[np.logical_and(datadets[:,2]==0.0 , datadets[:,3]==0.0)]
+        else:
+            if mode=="ladderdisk":
+                datadets = datadets[np.logical_and(datadets[:,2]==1.0 , datadets[:,3]==0.0)]
+
     print("Ladders and counter stats:")
 
     detsdict = {}
@@ -210,7 +231,7 @@ def datastats(data,printstat=False):
         for v in sorted_detsdict:
             print(str(v[0]) + "\t\t -->\t" + str(v[1]) + "/" + str(datadets.shape[0]))
 
-    print("Most populated ladders couple:\n" +str(list(sorted_detsdict[0][0])))
+    print("Most populated " + mode + " couple:\n" +str(list(sorted_detsdict[0][0])))
 
     topmodule = [[float(num)] for num in list(sorted_detsdict[0][0])]
 
@@ -375,7 +396,9 @@ def datafiltering(filters,alldata,savetoh=False,shuffle=False):
 
         return alldata
 
-def clustersInput(alldata,cols=8,rows=8,dropEdge=True,dropBad=True,dropBig=True,dropCosmic=False,dropCharge=False,bAndW=False,angularcorrection=True,sanitize=False,sanratio=0.5,writesample=False,samplesize=-1.0):
+def clustersInput(alldata,cols=8,rows=8,dropEdge=True,dropBad=True,dropBig=True,
+dropCosmic=False,dropCharge=False,bAndW=False,angularcorrection=True,sanitize=False,
+sanratio=0.5,writesample=False,samplesize=-1.0,writedata=False):
 
     nclusts = alldata.shape[0]
 
@@ -474,6 +497,7 @@ def clustersInput(alldata,cols=8,rows=8,dropEdge=True,dropBad=True,dropBig=True,
 
         with open(fileNP,'wb') as fnp:
             np.savez_compressed(fnp,truesample=trues,fakesample=fakes)
+
 
     nclusts = alldata.shape[0]
     alldata = alldata.reshape(nclusts,2*rows*cols+infos)
@@ -590,6 +614,25 @@ def clustersInput(alldata,cols=8,rows=8,dropEdge=True,dropBad=True,dropBig=True,
     infdata = np.append(alldata[:,0:datadict["inPix1"]],alldata[:,datadict["dummyFlag"]:],axis=1)
 
     labels = neuronLabels(infdata,2)
+
+    if writedata:
+
+        datOutput  = strftime("./outputs/%Y-%m-%d_%H_%M_%S_dat.txt", gmtime())
+        labOutput  = strftime("./outputs/%Y-%m-%d_%H_%M_%S_lab.txt", gmtime())
+        filOutput  = strftime("./outputs/%Y-%m-%d_%H_%M_%S_kind.txt", gmtime())
+
+        np.savetxt(datOutput, cltdata)
+        np.savetxt(labOutput, labels)
+
+        u = "Filters \n"
+
+        # with open(fileOuttxt + 'kind.txt', 'wb') as filtfile:
+        #     for k, v in filt.iteritems():
+        #         u += str(k) + " : " + str(v) + " - "
+        #         filtfile.write(u)
+        #
+        # sys.exit()
+
     if angularcorrection:
         cltdata=cltdata.reshape(nclusts,3,rows,2*cols)#,1)
     else:

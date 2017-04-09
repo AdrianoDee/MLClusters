@@ -54,6 +54,7 @@ if __name__ == "__main__":
     sanitize = False
     angC = False
     BandW = False
+    writedata = False
 
     epochs = 1000
     batchsize=100
@@ -84,17 +85,24 @@ if __name__ == "__main__":
                             if i+1 < sys.argv[0]:
                                 i = i + 1
                                 fileL = int(sys.argv[i])
+                        else:
+                            if(sys.argv[i] == "-w"):
+                                writedata = True
 
     print("- batchsize    : " + str(batchsize))
     print("- epochs limit : " + str(epochs))
     data     = cu.datasetload(fileslimit=fileL)
-    datatest = cu.datasetload(fileslimit=5,path='./datasets/test/')
+    datatest = cu.datasetload(fileslimit=1,path='./datasets/test/')
 
     # results = []
 
-    filters = [{"detCounterIn":[0.],"detCounterOut":[1.]},
+    filters = [cu.datastats(data,mode="laddder"),cu.datastats(data,mode="ladderdisk"),
+    cu.datastats(data,mode="disk"),
+    {"detCounterIn":[0.],"detCounterOut":[1.]},
     {"isBarrelIn":[0.],"isBarrelOut":[0.]},
-    cu.datastats(data),cu.datamodule(data)]
+    cu.datamodule(data)]
+
+    # {"isBarrelIn":[0.],"isBarrelOut":[0.]},
     # {"isBarrelIn":[1.],"isBarrelOut":[1.]},
     # {},
     # {"ladderIn":[0.],"ladderOut":[1.]},
@@ -110,13 +118,13 @@ if __name__ == "__main__":
 #   7 - detIn 4 detOut 5
 #   8 - inZ OutZ : [-5.0,5.0]
 
-    bathsizes = [100]
+    bathsizes = [100,20,200,50]
 
     print(data.shape)
     for batchsize in bathsizes:
         for filt in filters:
-            for angC in [False]:
-                for BandW in [False]:
+            for angC in [False,True]:
+                for BandW in [False,True]:
                     # opt = raw_input('Insert filter(s)? ')
 
                     timings = []
@@ -124,12 +132,11 @@ if __name__ == "__main__":
                     fileOuttxt = strftime("./outputs/%Y-%m-%d_%H_%M_%S_", gmtime())
 
                     datafil = cu.datafiltering(filt,data)
-                    (data_train, label_train) = cu.clustersInput(datafil,sanitize=True,sanratio=0.50,angularcorrection=angC,bAndW=BandW)
+                    (data_train, label_train) = cu.clustersInput(datafil,sanitize=True,sanratio=0.4,angularcorrection=angC,bAndW=BandW,writedata=True)
                     datafiltest = cu.datafiltering(filt,datatest)
-                    (data_test, label_test) = cu.clustersInput(datafiltest,sanitize=True,sanratio=0.50,angularcorrection=angC,bAndW=BandW)
+                    (data_test, label_test) = cu.clustersInput(datafiltest,sanitize=True,sanratio=0.4,angularcorrection=angC,bAndW=BandW)
 
                     print(data_train.shape)
-
 
                     # Create the clustercnn
                     clustercnn = Sequential()
