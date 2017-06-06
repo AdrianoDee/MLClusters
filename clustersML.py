@@ -562,7 +562,7 @@ def runComplete(fileL=100,filesPath="/eos/cms/store/cmst3/group/dehep/convPixels
                                     u += str(k) + " : " + str(v) + " - "
                                 filtfile.write(u)
 
-def runCSV(fileL=100,filesPath="./datasets/"):
+def runCSV(filesPath="./datasets/",filename="Hits.csv"):
 
     san = False
     writedata = False
@@ -576,7 +576,7 @@ def runCSV(fileL=100,filesPath="./datasets/"):
     print("- batchsize    : " + str(batchsize))
     print("- epochs limit : " + str(epochs))
 
-    dataall = cu.csvLoad(filen="Hits.csv",path="./datasets/")
+    dataall = cu.csvLoad(filen=filename,path=filesPath)
 
     numpy.random.shuffle(dataall)
 
