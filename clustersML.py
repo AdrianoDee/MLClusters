@@ -74,6 +74,8 @@ if __name__ == "__main__":
 
     splitting = 0.3
 
+    fnum = 0
+
     print("Starting Clusters CNN Training with: ")
 
     for i in range(1,len(sys.argv)):
@@ -123,6 +125,12 @@ if __name__ == "__main__":
                                                 if i+1 < sys.argv[0]:
                                                     i = i + 1
                                                     flipping = str(sys.argv[i])
+                                            else:
+                                                if (sys.argv[i] == "-filt"):
+                                                    print("- flipped drop")
+                                                    if i+1 < sys.argv[0]:
+                                                        i = i + 1
+                                                        fnum = str(sys.argv[i])
 
 
     print("- batchsize    : " + str(batchsize))
@@ -144,6 +152,8 @@ if __name__ == "__main__":
     {"detCounterIn":[0.],"detCounterOut":[1.]},
     {"isBarrelIn":[0.],"isBarrelOut":[0.]},
     cu.datamodule(data)]
+
+    filt = filters[min(fnum,len(filters)]
 
     # {"isBarrelIn":[0.],"isBarrelOut":[0.]},
     # {"isBarrelIn":[1.],"isBarrelOut":[1.]},
