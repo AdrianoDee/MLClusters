@@ -6,23 +6,34 @@ import sys
 import numpy as np
 import gzip
 import random
-import h5py as h5
 import operator
+
+import imp
+
+rootflag = True
+
+try:
+    imp.find_module('ROOT')
+    #from ROOT import *
+    rootflag = False
+except ImportError:
+    print("No ROOT")
+    rootflag = False
+
 #from ROOT import TH3F, TH2F, TCanvas
 
-from math import cos,sin
+from math import cos,sin,sqrt
 
 from time import gmtime, strftime
 
-np.set_printoptions(threshold=np.nan)
+#import matplotlib.mlab as mlab
+#import matplotlib.pyplot as plt
+#from mpl_toolkits.mplot3d import Axes3D
 
-import tensorflow as tf
+np.set_printoptions(threshold=np.nan)
 
 from os import listdir
 from os.path import isfile, join
-
-from tensorflow.contrib.learn.python.learn.datasets import base
-from tensorflow.python.framework import dtypes
 
 import time
 
@@ -51,11 +62,103 @@ def zetalabel(zeta):
         else:
                 return 1.0
 
+#for ACTS hits
+
+class actsHit:
+
+    def __init__(self):
+        self.cluster = []
+        self.adcs = []
+        self.xs = []
+        self.ys = []
+        self.trackID = 0
+        self.pixels = []
+
+    def __init__(self,c,t,h,x,y,z):
+        self.cluster = c
+
+        self.xs = c[:,0]
+        self.ys = c[:,1]
+        self.adcs = c[:,2]
+
+        self.trackID = t
+        self.hID = h
+        self.setPixels()
+
+        self.gx = x
+        self.gy = y
+        self.gz = z
+
+        self.Det = -1
+
+
+
+    # def setTrack(self,trackId,hitNumber):
+    #
+    #     if(hitNumber)>3:
+    #         track=trackId+"_"+hitNumber[:-2]+"_"+hitNumber[-2:]
+    #     else:
+    #         track=hitNumber+"_"+trackId
+    #
+    #     return track
+
+    def setPixels(self):
+
+        if rootflag:
+            clusterHisto = TH2F("clusterHisto","clusterHisto",8,int(self.x())-4,int(self.x())+4,8,int(self.y())-4,int(self.y())+4);
+            pixels=[]
+            for ny in range(0,clusterHisto.GetNbinsY()):
+                for nx in range(0,clusterHisto.GetNbinsX()):
+                    clusterHisto.SetBinContent(nx,ny,0.0)
+            for c in self.cluster:
+                clusterHisto.SetBinContent(clusterHisto.FindBin(c[0],c[1]),c[2])
+            for n in range(0,clusterHisto.GetNbinsY()*clusterHisto.GetNbinsX()):
+                pixels.append(clusterHisto.GetBinContent(n))
+
+            self.pixels=np.array(pixels)
+        else:
+            self.pixels=np.zeros(64)
+
+        # print(pixels)
+
+    def setDet(self,r):
+        if 200.0<r<230.0 and -800.<self.gz<800.0:
+            self.Det=0
+        else:
+            if 345.0<r<365.0 and -800.<self.gz<800.0:
+                self.Det=1
+            else:
+                self.Det=-1
+        # if 750.0<r<800.0 and -800.<self.gz<800.0:
+        #     self.Det=0
+        # else:
+        #     if 800.0<r<850.0 and -800.<self.gz<800.0:
+        #         self.Det=1
+        #     else:
+        #         self.Det=-1
+
+
+    def trackId(self):
+        return self.trackID
+
+    def charge(self):
+        return(np.sum(self.adcs))
+
+    def x(self):
+        qm=np.dot(self.xs,self.adcs)
+        return qm/self.charge()
+
+    def y(self):
+        qm=np.dot(self.ys,self.adcs)
+        return qm/self.charge()
+
+
+
 datalabs = ["run","evt","detSeqIn","detSeqOut","inZ","inX","inY","outZ",
 "outX","outY","detCounterIn","detCounterOut","isBarrelIn","isBarrelOut",
 "layerIn","ladderIn","moduleIn","sideIn","diskIn","panelIn","bladeIn",
 "layerOut","ladderOut","moduleOut","sideOut","diskOut","panelOut","bladeOut",
-"inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut",#"isFlippedIn","isFlippedOut",
+"inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut","isFlippedIn","isFlippedOut",
 "inPix1","inPix2","inPix3","inPix4","inPix5","inPix6","inPix7","inPix8",
 "inPix9","inPix10","inPix11","inPix12","inPix13","inPix14","inPix15","inPix16",
 "inPix17","inPix18","inPix19","inPix20","inPix21","inPix22","inPix23","inPix24",
@@ -81,7 +184,7 @@ infolabs = ["run","evt","detSeqIn","detSeqOut","inZ","inX","inY",
 "outZ","outX","outY","detCounterIn","detCounterOut","isBarrelIn","isBarrelOut",
 "layerIn","ladderIn","moduleIn","sideIn","diskIn","panelIn","bladeIn",
 "layerOut","ladderOut","moduleOut","sideOut","diskOut","panelOut","bladeOut",
-"inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut",#"isFlippedIn","isFlippedOut",
+"inId","outId","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut","isFlippedIn","isFlippedOut",
 "dummyFlag","idTrack","px","py","pz","pt","mT","eT","mSqr","rapidity","etaTrack","phi",
 "pdgId","charge","noTrackerHits","noTrackerLayers","dZ","dXY","Xvertex",
 "Yvertex","Zvertex","bunCross","isCosmic","chargeMatch","sigMatch"]
@@ -101,6 +204,11 @@ multlabs = ["run","evt","detSeqIn","detSeqOut","detCounterIn","detCounterOut","i
 
 ranglabs = ["inZ","inX","inY","outZ","outX","outY","px","py","pz","pt","mT","eT","mSqr","rapidity","etaTrack","phi",
 "pdgId","dZ","dXY","Xvertex","Yvertex","Zvertex"]
+
+actsDummyOne=[0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+actsDummyOne=[0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+csvinfos = ["hitCounter", "barcode", "gx", "gy", "gz","cluster"]
 
 infoinds = [n for n in range(len(infolabs))]
 datainds = [n for n in range(len(datalabs))]
@@ -171,6 +279,96 @@ def classNumbers(data):
     labels = np.array(labels)
     print(labels.shape)
     return labels
+
+def makeDoublets(hits):
+    print("====Make doublets")
+    print(len(hits))
+    doublets = []
+
+    # for hit1 in hits:
+    for h1 in range(0,len(hits)):
+        hit1=hits[h1]
+        trackOneId = hit1.trackID
+        hitOneId = hit1.hID
+
+
+        trackDoublet=False
+        trackPassed=False
+        # for hit2 in hits:
+        for h2 in range(h1,len(hits)):
+            hit2=hits[h2]
+            if hit1.gx==hit2.gx and hit1.gy==hit2.gy and hit1.gz==hit2.gz:
+                continue
+
+            trackTwoId = hit2.trackID
+            hitTwoId = hit2.hID
+
+            # print("Hit in : " + str(hitOneId) +" "+ str(trackOneId))
+            # print("Hit out : " + str(hitTwoId) +" "+ str(trackTwoId))
+
+            pdg=0
+
+            if trackTwoId==trackOneId:
+                trackPassed=True
+            else:
+                if trackPassed:
+                    break
+
+            if trackTwoId==trackOneId and hitTwoId==hitOneId+1.:
+                # print("Doublet")
+                trackDoublet=True
+                doublet=np.array([1,1,hit1.Det,hit2.Det,hit1.gx,hit1.gy,hit1.gz,hit2.gx,hit2.gy,hit2.gz,hit1.Det,hit2.Det,float(True),float(True)])
+                doublet = np.concatenate((doublet,np.zeros(14)))
+                doublet = np.concatenate((doublet,np.array([hitOneId,hitTwoId])))
+                doublet = np.concatenate((doublet,np.array([float(False),float(False),float(False),float(False)])))
+                doublet = np.concatenate((doublet,np.array([float(False),float(False),float(False),float(False)])))
+                doublet = np.concatenate((doublet,hit1.pixels))
+                doublet = np.concatenate((doublet,hit2.pixels))
+                doublet = np.concatenate((doublet,np.array([542,trackOneId])))
+                doublet = np.concatenate((doublet,np.zeros(10)))
+                doublet = np.concatenate((doublet,np.array([211,1.0])))
+                doublet = np.concatenate((doublet,np.zeros(len(datalabs)-doublet.shape[0])))
+                doublets.append(doublet)
+                # print("Doublet : " + str(doublet.shape[0]))
+                break
+                #print(doublet)
+        if trackDoublet:
+            continue
+
+    # print(len(doublets))
+    hitsIn = np.array([h for h in hits if h.Det == 0])
+    hitsOut = np.array([h for h in hits if h.Det == 1])
+
+    for hit1, hit2 in zip(hitsIn, hitsOut):
+
+        if hit1.gx==hit2.gx and hit1.gy==hit2.gy and hit1.gz==hit2.gz:
+            continue
+
+        trackTwoId = hit2.trackID
+        hitTwoId = hit2.hID
+
+        trackOneId = hit1.trackID
+        hitOneId = hit1.hID
+
+        if trackTwoId!=trackOneId or hitTwoId!=hitOneId+1.:
+            # print("Doublet")
+            doublet=np.array([1,1,hit1.Det,hit2.Det,hit1.gx,hit1.gy,hit1.gz,hit2.gx,hit2.gy,hit2.gz,hit1.Det,hit2.Det,float(True),float(True)])
+            doublet = np.concatenate((doublet,np.zeros(14)))
+            doublet = np.concatenate((doublet,np.array([hitOneId,hitTwoId])))
+            doublet = np.concatenate((doublet,np.array([float(False),float(False),float(False),float(False)])))
+            doublet = np.concatenate((doublet,np.array([float(False),float(False),float(False),float(False)])))
+            doublet = np.concatenate((doublet,hit1.pixels))
+            doublet = np.concatenate((doublet,hit2.pixels))
+            doublet = np.concatenate((doublet,np.array([542,trackOneId])))
+            doublet = np.concatenate((doublet,np.zeros(10)))
+            doublet = np.concatenate((doublet,np.array([0.0,1.0])))
+            doublet = np.concatenate((doublet,np.zeros(len(datalabs)-doublet.shape[0])))
+            doublets.append(doublet)
+
+    doublets=np.array(doublets)
+    print(doublets.shape[0])
+    print(doublets.shape)
+    return np.array(doublets)
 
 def labelsToNeurons(labels, num_classes):
   num_labels = int(labels.shape[0])
@@ -275,11 +473,248 @@ def datamodule(data,printstat=False):
     filterStat = dict(zip(detslabs,topmodule))
     return filterStat
 
-def datasetload(path='./datasets/',delimit='\t',fileslimit =-1,writetohd = False,type="",filterstats = False):
+# def csvPixels(filen,path,delimit=','):
 
-    datafiles = np.array([f for f in listdir(path) if (isfile(join(path, f)) and  f.lower().endswith(('.txt',".gz")))])
+# def csvActsStat(hits):
+#     print("- Plots & Stats for CSV ACTS hit file : " + path + filen)
+#
+#     rxy=[]
+#     rzy=[]
+#     x=[]
+#     y=[]
+#     z=[]
+#
+#
+#     for hit in hits:
+#
+#         r = sqrt(hit.gx**2 + hit.gy**2)
+#
+#         rxy.append(r)
+#         rzy.append(sqrt(hit.gy**2 + hit.gz**2))
+#
+#         hit.setDet(sqrt(hit.gx**2 + hit.gy**2))
+#
+#         if r:
+#             x.append(hit.gx)
+#             y.append(hit.gy)
+#             z.append(hit.gz)
+#
+#     figxy, axxy = plt.subplots(figsize=(8, 4.5))
+#     figzy, axzy = plt.subplots(figsize=(8, 4.5))
+#     figy, axy = plt.subplots(figsize=(8, 4.5))
+#     figx, axx = plt.subplots(figsize=(8, 4.5))
+#     figz, axz = plt.subplots(figsize=(8, 4.5))
+#
+#     axxy.set_ylabel('#')
+#     axzy.set_ylabel('#')
+#     axx.set_ylabel('#')
+#     axy.set_ylabel('#')
+#     axz.set_ylabel('#')
+#
+#     axxy.set_xlabel('r(xy)')
+#     axzy.set_xlabel('r(zy)')
+#     axx.set_xlabel('x')
+#     axy.set_xlabel('y')
+#     axz.set_xlabel('z')
+#
+#     axxy.set_title('Hits counts - r(xy)')
+#     axzy.set_title('Hits counts - r(zy)')
+#     axx.set_title('Hits counts - x')
+#     axy.set_title('Hits counts - y')
+#     axz.set_title('Hits counts - z')
+#
+#     # fig3d = plt.figure()
+#     # a3d = fig3d.add_subplot(111, projection='3d')
+#
+#     n, bins, patches = axxy.hist(rxy, 1000, facecolor='green', alpha=0.75)
+#     n, bins, patches = axzy.hist(rzy, 1000, facecolor='blue', alpha=0.75)
+#     n, bins, patches = axx.hist(x, 1000, facecolor='red', alpha=0.75)
+#     n, bins, patches = axy.hist(y, 1000, facecolor='yellow', alpha=0.75)
+#     n, bins, patches = axz.hist(z, 1000, facecolor='brown', alpha=0.75)
+#
+#     print(bins)
+#     # plt.show()
+#
+#     figxy.savefig("rxy.eps")
+#     figzy.savefig("rzy.eps")
+#     figy.savefig("y.eps")
+#     figx.savefig("x.eps")
+#     figz.savefig("z.eps")
 
-    if len(datafiles) > fileslimit > 0:
+def csvActsStats(filen,path,maximum=-1):
+
+    print("- Plots & Stats for CSV ACTS hit file : " + path + filen)
+
+    with open(path + filen) as f:
+        hits = csvActsHits(f,maximum)
+
+    rxy=[]
+    rzy=[]
+    x=[]
+    y=[]
+    z=[]
+
+
+    for hit in hits:
+
+        # 750.0<r<800.0 and -800.<self.gz<800.0:
+        r = sqrt(hit.gx**2 + hit.gy**2)
+
+        rxy.append(r)
+        rzy.append(sqrt(hit.gy**2 + hit.gz**2))
+
+        hit.setDet(sqrt(hit.gx**2 + hit.gy**2))
+
+        if 200.0<r<230.0 :
+
+            x.append(hit.gx)
+            y.append(hit.gy)
+            z.append(hit.gz)
+
+
+    figxy, axxy = plt.subplots(figsize=(8, 4.5))
+    figzy, axzy = plt.subplots(figsize=(8, 4.5))
+    figy, axy = plt.subplots(figsize=(8, 4.5))
+    figx, axx = plt.subplots(figsize=(8, 4.5))
+    figz, axz = plt.subplots(figsize=(8, 4.5))
+    figddr, axddr = plt.subplots(figsize=(8, 4.5))
+
+    axxy.set_ylabel('#')
+    axzy.set_ylabel('#')
+    axx.set_ylabel('#')
+    axy.set_ylabel('#')
+    axz.set_ylabel('#')
+    axddr.set_ylabel('#')
+
+    axxy.set_xlabel('r(xy)')
+    axzy.set_xlabel('r(zy)')
+    axx.set_xlabel('x')
+    axy.set_xlabel('y')
+    axz.set_xlabel('z')
+    axddr.set_xlabel('ddr')
+
+    axxy.set_title('Hits counts - r(xy)')
+    axzy.set_title('Hits counts - r(zy)')
+    axx.set_title('Hits counts - x')
+    axy.set_title('Hits counts - y')
+    axz.set_title('Hits counts - z')
+    axddr.set_title('Hits counts - ddr')
+
+    # fig3d = plt.figure()
+    # a3d = fig3d.add_subplot(111, projection='3d')
+
+    n, bins, patches = axxy.hist(rxy, 1000, facecolor='green', alpha=0.75)
+    n, bins, patches = axzy.hist(rzy, 1000, facecolor='blue', alpha=0.75)
+    n, bins, patches = axx.hist(x, 1000, facecolor='red', alpha=0.75)
+    n, bins, patches = axy.hist(y, 1000, facecolor='yellow', alpha=0.75)
+    n, bins, patches = axz.hist(z, 1000, facecolor='brown', alpha=0.75)
+
+    # print (bins)
+    # print (n)
+    # print (patches)
+
+    ddr = []
+
+    for h1 in range(0,len(hits)):
+        hit1 = hits[h1]
+        x1 = hit1.gx
+        y1 = hit1.gy
+        z1 = hit1.gz
+
+        for h2 in range(h1,len(hits)):
+
+            hit2=hits[h2]
+
+            if x1==hit2.gx and y1==hit2.gy and z1==hit2.gz:
+                continue
+
+            ddr.append(sqrt((x1-hit2.gx)**2 + (y1-hit2.gy)**2 + (z1-hit2.gz)**2))
+
+    n, bins, patches = axddr.hist(ddr, 1000, facecolor='blue', alpha=0.75)
+
+    figxy.savefig("rxy.eps")
+    figzy.savefig("rzy.eps")
+    figy.savefig("y.eps")
+    figx.savefig("x.eps")
+    figz.savefig("z.eps")
+    figddr.savefig("ddr.eps")
+
+    plt.show()
+
+def csvActsHits(f,maximum=-1):
+
+    counter = 0
+
+    hhh = []
+
+    for line in f:
+        counter += 1
+        line=line.replace("\n","")
+        line=line.replace("\r","")
+        line=line.replace("[","")
+        line=line.replace("]","")
+        line=line.replace("\b","")
+        line=line.replace(" ","")
+        hit =[f.strip() for f in line.split(',')]
+        hhh.append(hit)
+
+        if maximum > 0 and counter > maximum:
+            break
+
+    hits = []
+
+    for hh in hhh:
+
+        hit = []
+        hh = filter(None, hh)
+
+        if len(hh)>0:
+
+            cluster=np.array(hh[9:])
+            cluster=cluster.reshape(int(cluster.shape[0]/3),3)
+
+            for h in hh:
+                hit.append(float(h))
+
+        if len(hh)>=12:
+            cluster=np.array(hit[9:])
+
+            cluster=cluster.reshape(int(cluster.shape[0]/3),3)
+            hits.append(actsHit(cluster,hit[0],hit[1],hit[6],hit[7],hit[8]))
+
+    return hits
+
+
+def csvActsLoad(filen,path,maximum=-1):
+
+    print("- Loading CSV ACTS hit file : " + path + filen)
+
+    hits = []
+
+    with open(path + filen) as f:
+        hits = csvActsHits(f,maximum)
+
+    csvActsStat(hits)
+    #Selecting
+    cleanHits = []
+
+    for hit in hits:
+        hit.setDet(sqrt(hit.gx**2 + hit.gy**2))
+        if hit.Det==0 or hit.Det==1:
+            # print(hit.Det)
+            cleanHits.append(hit)
+
+    return makeDoublets(cleanHits)
+
+def datasetload(filesList,path,delimit='\t',fileslimit =-1,writetohd = False,type="",filterstats = False,flip="-1"):
+
+    # datafiles = np.array([f for f in listdir(path) if (isfile(join(path, f)) and  f.lower().endswith(('.txt',".gz")))])
+    datafiles = filesList
+
+    if fileslimit < 1:
+        fileslimit = 1
+
+    if len(filesList) > fileslimit > 0:
 
         idx = np.random.randint(int(datafiles.shape[0]), size=int(fileslimit))
         datafiles = datafiles[idx]
@@ -288,22 +723,36 @@ def datasetload(path='./datasets/',delimit='\t',fileslimit =-1,writetohd = False
     print("Loading " + str(len(datafiles)) + " dataset file(s) . . .")
 
     datasets  = []
-    for filename in datafiles:
+    for no,filename in enumerate(datafiles):
         if filename.lower().endswith('.txt'):
             with open(path + filename, 'rb') as f:
-                print ("Reading clusters from txt :",f.name)
+                print ("Reading clusters from txt no."+ str(no+1) +" :",f.name)
                 f.seek(0)
-                data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
+                # data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
+                data = np.loadtxt(f,delimiter=delimit,dtype = np.float32)
                 datasets.append(data)
 
         if filename.lower().endswith('.gz'):
             with gzip.open(path + filename, 'rb') as f:
-                print ("Reading clusters from zip :",f.name)
+                print ("Reading clusters from zip no."+ str(no+1) +" :",f.name)
                 f.seek(0)
-                data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
+                # data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
+                data = np.loadtxt(f,delimiter=delimit,dtype = np.float32)
                 datasets.append(data)
 
     data = np.vstack(datasets)
+
+    if flip=="0":
+        print("Chosing only not flipped module hits . . .")
+        alldata = alldata[np.logical_and(alldata[:,datadict["isFlippedIn"]]==0.,alldata[:,datadict["isFlippedOut"]]==0.)]
+        print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
+        nclusts = alldata.shape[0]
+
+    if flip=="1":
+        print("Chosing only flipped module hits . . .")
+        alldata = alldata[np.logical_and(alldata[:,datadict["isFlippedIn"]]==1.,alldata[:,datadict["isFlippedOut"]]==1.)]
+        print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
+        nclusts = alldata.shape[0]
 
     # print(data[10])
     # minX = np.amin(data[:,datadict["inX"]])
@@ -397,8 +846,10 @@ def datafiltering(filters,alldata,savetoh=False,shuffle=False):
         return alldata
 
 def clustersInput(alldata,cols=8,rows=8,dropEdge=True,dropBad=True,dropBig=True,
-dropCosmic=False,dropCharge=False,bAndW=False,angularcorrection=True,sanitize=False,
-sanratio=0.5,writesample=False,samplesize=-1.0,writedata=False):
+dropCosmic=False,dropCharge=False,bAndW=False,thetacorrection=True,phicorrection=True,sanitize=False,
+sanratio=0.5,writesample=False,samplesize=-1.0,writedata=False,flip="-1"):
+
+    angularcorrection  = thetacorrection or phicorrection
 
     nclusts = alldata.shape[0]
 
@@ -507,16 +958,18 @@ sanratio=0.5,writesample=False,samplesize=-1.0,writedata=False):
 
     if angularcorrection:
 
-        # inXs =
-        # inYs =
-        cosIns = np.cos(np.arctan(np.multiply(alldata[:,datadict["inY"]],1.0/alldata[:,datadict["inX"]])))
-        cosOuts = np.cos(np.arctan(np.multiply(alldata[:,datadict["outY"]],1.0/alldata[:,datadict["outX"]])))
-        sinIns = np.sin(np.arctan(np.multiply(alldata[:,datadict["inY"]],1.0/alldata[:,datadict["inX"]])))
-        sinOuts = np.sin(np.arctan(np.multiply(alldata[:,datadict["outY"]],1.0/alldata[:,datadict["outX"]])))
-        cosZYIns = np.cos(np.arctan(np.multiply(alldata[:,datadict["inY"]],1.0/alldata[:,datadict["inZ"]])))
-        cosZYOuts = np.cos(np.arctan(np.multiply(alldata[:,datadict["outY"]],1.0/alldata[:,datadict["outZ"]])))
-        # print(cosIns[3])
-        # cosIns = cos(alldata[)
+        #phi correction
+        cosPhiIns = np.cos(np.arctan(np.multiply(alldata[:,datadict["inY"]],1.0/alldata[:,datadict["inX"]])))
+        cosPhiOuts = np.cos(np.arctan(np.multiply(alldata[:,datadict["outY"]],1.0/alldata[:,datadict["outX"]])))
+        sinPhiIns = np.sin(np.arctan(np.multiply(alldata[:,datadict["inY"]],1.0/alldata[:,datadict["inX"]])))
+        sinPhiOuts = np.sin(np.arctan(np.multiply(alldata[:,datadict["outY"]],1.0/alldata[:,datadict["outX"]])))
+
+        #theta correction
+        cosThetaIns = np.cos(np.arctan(np.multiply(alldata[:,datadict["inY"]],1.0/alldata[:,datadict["inZ"]])))
+        cosThetaOuts = np.cos(np.arctan(np.multiply(alldata[:,datadict["outY"]],1.0/alldata[:,datadict["outZ"]])))
+        sinThetaIns = np.sin(np.arctan(np.multiply(alldata[:,datadict["inY"]],1.0/alldata[:,datadict["inZ"]])))
+        sinThetaOuts = np.sin(np.arctan(np.multiply(alldata[:,datadict["outY"]],1.0/alldata[:,datadict["outZ"]])))
+
         inClust  = alldata[:,datadict["inPix1"]:datadict["outPix1"]]
         outClust = alldata[:,datadict["outPix1"]:datadict["dummyFlag"]]
 
@@ -540,31 +993,43 @@ sanratio=0.5,writesample=False,samplesize=-1.0,writedata=False):
         # print(outClust[0])
 
         print("Applying angular correction")
-        inClustModC = np.multiply(inClust,cosIns[:,np.newaxis])
-        outClustModC = np.multiply(outClust,cosOuts[:,np.newaxis])
+        inPhiModC = np.multiply(inClust,cosPhiIns[:,np.newaxis])
+        outPhiModC = np.multiply(outClust,cosPhiOuts[:,np.newaxis])
 
-        inClustModS = np.multiply(inClust,sinIns[:,np.newaxis])
-        outClustModS = np.multiply(outClust,sinOuts[:,np.newaxis])
+        inPhiModS = np.multiply(inClust,sinPhiIns[:,np.newaxis])
+        outPhiModS = np.multiply(outClust,sinPhiOuts[:,np.newaxis])
 
-        # print(inClustModC[0])
-        # print(inClustModS[0])
-        # print(cosIns[0])
+        inThetaModC = np.multiply(inClust,cosThetaIns[:,np.newaxis])
+        outThetaModC = np.multiply(outClust,cosThetaOuts[:,np.newaxis])
+
+        inThetaModS = np.multiply(inClust,sinThetaIns[:,np.newaxis])
+        outThetaModS = np.multiply(outClust,sinThetaOuts[:,np.newaxis])
+
+        # print(inPhiModC[0])
+        # print(inPhiModS[0])
+        # print(cosPhiIns[0])
         #
         #
-        # print(outClustModC[0])
-        # print(outClustModS[0])
-        # print(cosOuts[0])
+        # print(outPhiModC[0])
+        # print(outPhiModS[0])
+        # print(cosPhiOuts[0])
         # print(cosZYIns)
         # print(cosZYOuts)
 
-        # inClust = np.multiply(inClust,sinIns[:,np.newaxis])
-        # outClust = np.multiply(outClust,sinOuts[:,np.newaxis])
+        # inClust = np.multiply(inClust,sinPhiIns[:,np.newaxis])
+        # outClust = np.multiply(outClust,sinPhiOuts[:,np.newaxis])
 
-        inClustC  = inClust  + inClustModC
-        outClustC = outClust + outClustModC
+        inPhiC  = inClust  + inPhiModC
+        outPhiC = outClust + outPhiModC
 
-        inClustS  = inClust  + inClustModS
-        outClustS = outClust + outClustModS
+        inPhiS  = inClust  + inPhiModS
+        outPhiS = outClust + outPhiModS
+
+        inThetaC  = inClust  + inThetaModC
+        outThetaC = outClust + outThetaModC
+
+        inThetaS  = inClust  + inThetaModS
+        outThetaS = outClust + outThetaModS
 
         # print(inClust[0])
         # print(outClust[0])
@@ -576,21 +1041,41 @@ sanratio=0.5,writesample=False,samplesize=-1.0,writedata=False):
         # print("=====")
         # print(inClust.shape)
         # print(outClust.shape)
+
         R = np.hstack((inClust,outClust))
-        G = np.hstack((inClustC,outClustC))
-        B = np.hstack((inClustS,outClustS))
+
+        G = np.hstack((inPhiC,outPhiC))
+        B = np.hstack((inPhiS,outPhiS))
+
+        C = np.hstack((inThetaC,outThetaC))
+        K = np.hstack((inThetaS,outThetaS))
+
         cltdata = []
-        for r,g,b in zip(R,G,B):
-            cltdata.append(r)
-            cltdata.append(g)
-            cltdata.append(b)
+        if phicorrection:
+            if thetacorrection:
+                for r,g,b,c,k in zip(R,G,B,C,K):
+                    cltdata.append(r)
+                    cltdata.append(g)
+                    cltdata.append(b)
+                    cltdata.append(c)
+                    cltdata.append(k)
+            else:
+                for r,g,b in zip(R,G,B):
+                    cltdata.append(r)
+                    cltdata.append(g)
+                    cltdata.append(b)
+        else:
+            for r,c,k in zip(R,C,K):
+                cltdata.append(r)
+                cltdata.append(c)
+                cltdata.append(k)
 
         # cltdata = np.vstack((R,G,B))
         cltdata = np.array(cltdata)
         # print(cltdata.shape)
         # print(cltdata[0])
         # print(cltdata[0].shape)
-        # if angularcorrection:
+        # if thetacorrection:
         #     print(cltdata[1])
         #     print(cltdata[1].shape)
         #     print(cltdata[2])
@@ -634,7 +1119,10 @@ sanratio=0.5,writesample=False,samplesize=-1.0,writedata=False):
         # sys.exit()
 
     if angularcorrection:
-        cltdata=cltdata.reshape(nclusts,3,rows,2*cols)#,1)
+        if phicorrection and thetacorrection:
+            cltdata=cltdata.reshape(nclusts,5,rows,2*cols)#,1)
+        else:
+            cltdata=cltdata.reshape(nclusts,3,rows,2*cols)
     else:
         cltdata=cltdata.reshape(nclusts,1,rows,2*cols)
 
@@ -689,7 +1177,7 @@ def barrelMap(alldata,cols=8,rows=8,dropEdge=False,dropBad=False,dropBig=False,d
     alldata = alldata[alldata[:,datadict["isBarrelOut"]]==float(True)]
     print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
 
-    mapTH   = TH2F("clusterAtlas","clusterAtlas",130,-65,65,50,-25,25)
+    mapTH  = TH2F("clusterAtlas","clusterAtlas",130,-65,65,50,-25,25)
 
     mapclusts = []
     for data in alldata:
