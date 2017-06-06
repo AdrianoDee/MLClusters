@@ -14,8 +14,7 @@ rootflag = True
 
 try:
     imp.find_module('ROOT')
-    #from ROOT import *
-    rootflag = False
+    from ROOT import *
 except ImportError:
     print("No ROOT")
     rootflag = False
@@ -26,9 +25,9 @@ from math import cos,sin,sqrt
 
 from time import gmtime, strftime
 
-#import matplotlib.mlab as mlab
-#import matplotlib.pyplot as plt
-#from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 np.set_printoptions(threshold=np.nan)
 
@@ -104,38 +103,27 @@ class actsHit:
 
     def setPixels(self):
 
-        if rootflag:
-            clusterHisto = TH2F("clusterHisto","clusterHisto",8,int(self.x())-4,int(self.x())+4,8,int(self.y())-4,int(self.y())+4);
-            pixels=[]
-            for ny in range(0,clusterHisto.GetNbinsY()):
-                for nx in range(0,clusterHisto.GetNbinsX()):
-                    clusterHisto.SetBinContent(nx,ny,0.0)
-            for c in self.cluster:
-                clusterHisto.SetBinContent(clusterHisto.FindBin(c[0],c[1]),c[2])
-            for n in range(0,clusterHisto.GetNbinsY()*clusterHisto.GetNbinsX()):
-                pixels.append(clusterHisto.GetBinContent(n))
+        clusterHisto = TH2F("clusterHisto","clusterHisto",8,int(self.x())-4,int(self.x())+4,8,int(self.y())-4,int(self.y())+4);
+        pixels=[]
+        for ny in range(0,clusterHisto.GetNbinsY()):
+            for nx in range(0,clusterHisto.GetNbinsX()):
+                clusterHisto.SetBinContent(nx,ny,0.0)
+        for c in self.cluster:
+            clusterHisto.SetBinContent(clusterHisto.FindBin(c[0],c[1]),c[2])
+        for n in range(0,clusterHisto.GetNbinsY()*clusterHisto.GetNbinsX()):
+            pixels.append(clusterHisto.GetBinContent(n))
 
-            self.pixels=np.array(pixels)
-        else:
-            self.pixels=np.zeros(64)
-
+        self.pixels=np.array(pixels)
         # print(pixels)
 
     def setDet(self,r):
-        if 200.0<r<230.0 and -800.<self.gz<800.0:
+        if 25.0<r<35.0 and -800.<self.gz<800.0:
             self.Det=0
         else:
-            if 345.0<r<365.0 and -800.<self.gz<800.0:
+            if 50.0<r<60.0 and -800.<self.gz<800.0:
                 self.Det=1
             else:
                 self.Det=-1
-        # if 750.0<r<800.0 and -800.<self.gz<800.0:
-        #     self.Det=0
-        # else:
-        #     if 800.0<r<850.0 and -800.<self.gz<800.0:
-        #         self.Det=1
-        #     else:
-        #         self.Det=-1
 
 
     def trackId(self):
@@ -475,229 +463,56 @@ def datamodule(data,printstat=False):
 
 # def csvPixels(filen,path,delimit=','):
 
-# def csvActsStat(hits):
-#     print("- Plots & Stats for CSV ACTS hit file : " + path + filen)
-#
-#     rxy=[]
-#     rzy=[]
-#     x=[]
-#     y=[]
-#     z=[]
-#
-#
-#     for hit in hits:
-#
-#         r = sqrt(hit.gx**2 + hit.gy**2)
-#
-#         rxy.append(r)
-#         rzy.append(sqrt(hit.gy**2 + hit.gz**2))
-#
-#         hit.setDet(sqrt(hit.gx**2 + hit.gy**2))
-#
-#         if r:
-#             x.append(hit.gx)
-#             y.append(hit.gy)
-#             z.append(hit.gz)
-#
-#     figxy, axxy = plt.subplots(figsize=(8, 4.5))
-#     figzy, axzy = plt.subplots(figsize=(8, 4.5))
-#     figy, axy = plt.subplots(figsize=(8, 4.5))
-#     figx, axx = plt.subplots(figsize=(8, 4.5))
-#     figz, axz = plt.subplots(figsize=(8, 4.5))
-#
-#     axxy.set_ylabel('#')
-#     axzy.set_ylabel('#')
-#     axx.set_ylabel('#')
-#     axy.set_ylabel('#')
-#     axz.set_ylabel('#')
-#
-#     axxy.set_xlabel('r(xy)')
-#     axzy.set_xlabel('r(zy)')
-#     axx.set_xlabel('x')
-#     axy.set_xlabel('y')
-#     axz.set_xlabel('z')
-#
-#     axxy.set_title('Hits counts - r(xy)')
-#     axzy.set_title('Hits counts - r(zy)')
-#     axx.set_title('Hits counts - x')
-#     axy.set_title('Hits counts - y')
-#     axz.set_title('Hits counts - z')
-#
-#     # fig3d = plt.figure()
-#     # a3d = fig3d.add_subplot(111, projection='3d')
-#
-#     n, bins, patches = axxy.hist(rxy, 1000, facecolor='green', alpha=0.75)
-#     n, bins, patches = axzy.hist(rzy, 1000, facecolor='blue', alpha=0.75)
-#     n, bins, patches = axx.hist(x, 1000, facecolor='red', alpha=0.75)
-#     n, bins, patches = axy.hist(y, 1000, facecolor='yellow', alpha=0.75)
-#     n, bins, patches = axz.hist(z, 1000, facecolor='brown', alpha=0.75)
-#
-#     print(bins)
-#     # plt.show()
-#
-#     figxy.savefig("rxy.eps")
-#     figzy.savefig("rzy.eps")
-#     figy.savefig("y.eps")
-#     figx.savefig("x.eps")
-#     figz.savefig("z.eps")
 
-def csvActsStats(filen,path,maximum=-1):
+def csvLoad(filen,path,delimit=','):
 
-    print("- Plots & Stats for CSV ACTS hit file : " + path + filen)
-
-    with open(path + filen) as f:
-        hits = csvActsHits(f,maximum)
-
-    rxy=[]
-    rzy=[]
-    x=[]
-    y=[]
-    z=[]
-
-
-    for hit in hits:
-
-        # 750.0<r<800.0 and -800.<self.gz<800.0:
-        r = sqrt(hit.gx**2 + hit.gy**2)
-
-        rxy.append(r)
-        rzy.append(sqrt(hit.gy**2 + hit.gz**2))
-
-        hit.setDet(sqrt(hit.gx**2 + hit.gy**2))
-
-        if 200.0<r<230.0 :
-
-            x.append(hit.gx)
-            y.append(hit.gy)
-            z.append(hit.gz)
-
-
-    figxy, axxy = plt.subplots(figsize=(8, 4.5))
-    figzy, axzy = plt.subplots(figsize=(8, 4.5))
-    figy, axy = plt.subplots(figsize=(8, 4.5))
-    figx, axx = plt.subplots(figsize=(8, 4.5))
-    figz, axz = plt.subplots(figsize=(8, 4.5))
-    figddr, axddr = plt.subplots(figsize=(8, 4.5))
-
-    axxy.set_ylabel('#')
-    axzy.set_ylabel('#')
-    axx.set_ylabel('#')
-    axy.set_ylabel('#')
-    axz.set_ylabel('#')
-    axddr.set_ylabel('#')
-
-    axxy.set_xlabel('r(xy)')
-    axzy.set_xlabel('r(zy)')
-    axx.set_xlabel('x')
-    axy.set_xlabel('y')
-    axz.set_xlabel('z')
-    axddr.set_xlabel('ddr')
-
-    axxy.set_title('Hits counts - r(xy)')
-    axzy.set_title('Hits counts - r(zy)')
-    axx.set_title('Hits counts - x')
-    axy.set_title('Hits counts - y')
-    axz.set_title('Hits counts - z')
-    axddr.set_title('Hits counts - ddr')
-
-    # fig3d = plt.figure()
-    # a3d = fig3d.add_subplot(111, projection='3d')
-
-    n, bins, patches = axxy.hist(rxy, 1000, facecolor='green', alpha=0.75)
-    n, bins, patches = axzy.hist(rzy, 1000, facecolor='blue', alpha=0.75)
-    n, bins, patches = axx.hist(x, 1000, facecolor='red', alpha=0.75)
-    n, bins, patches = axy.hist(y, 1000, facecolor='yellow', alpha=0.75)
-    n, bins, patches = axz.hist(z, 1000, facecolor='brown', alpha=0.75)
-
-    # print (bins)
-    # print (n)
-    # print (patches)
-
-    ddr = []
-
-    for h1 in range(0,len(hits)):
-        hit1 = hits[h1]
-        x1 = hit1.gx
-        y1 = hit1.gy
-        z1 = hit1.gz
-
-        for h2 in range(h1,len(hits)):
-
-            hit2=hits[h2]
-
-            if x1==hit2.gx and y1==hit2.gy and z1==hit2.gz:
-                continue
-
-            ddr.append(sqrt((x1-hit2.gx)**2 + (y1-hit2.gy)**2 + (z1-hit2.gz)**2))
-
-    n, bins, patches = axddr.hist(ddr, 1000, facecolor='blue', alpha=0.75)
-
-    figxy.savefig("rxy.eps")
-    figzy.savefig("rzy.eps")
-    figy.savefig("y.eps")
-    figx.savefig("x.eps")
-    figz.savefig("z.eps")
-    figddr.savefig("ddr.eps")
-
-    plt.show()
-
-def csvActsHits(f,maximum=-1):
-
-    counter = 0
-
-    hhh = []
-
-    for line in f:
-        counter += 1
-        line=line.replace("\n","")
-        line=line.replace("\r","")
-        line=line.replace("[","")
-        line=line.replace("]","")
-        line=line.replace("\b","")
-        line=line.replace(" ","")
-        hit =[f.strip() for f in line.split(',')]
-        hhh.append(hit)
-
-        if maximum > 0 and counter > maximum:
-            break
-
+    dectsLimits=[[0.0]]
     hits = []
-
-    for hh in hhh:
-
-        hit = []
-        hh = filter(None, hh)
-
-        if len(hh)>0:
-
-            cluster=np.array(hh[9:])
-            cluster=cluster.reshape(int(cluster.shape[0]/3),3)
-
-            for h in hh:
-                hit.append(float(h))
-
-        if len(hh)>=12:
-            cluster=np.array(hit[9:])
-
-            cluster=cluster.reshape(int(cluster.shape[0]/3),3)
-            hits.append(actsHit(cluster,hit[0],hit[1],hit[6],hit[7],hit[8]))
-
-    return hits
-
-
-def csvActsLoad(filen,path,maximum=-1):
-
-    print("- Loading CSV ACTS hit file : " + path + filen)
-
-    hits = []
-
     with open(path + filen) as f:
-        hits = csvActsHits(f,maximum)
+        hhh = []
+        print("STRINGS")
+        for line in f:
+            line=line.replace("\n","")
+            line=line.replace("\r","")
+            line=line.replace("[","")
+            line=line.replace("]","")
+            line=line.replace("\b","")
+            line=line.replace(" ","")
+            hit =[f.strip() for f in line.split(',')]
+            hhh.append(hit)
 
-    csvActsStat(hits)
-    #Selecting
+        print("HITS")
+
+        #for j in range(0,100000):
+        for hh in hhh:
+            # hh=hhh[j]
+            hit = []
+            hh = filter(None, hh)
+            # hit = actsHit()
+            # print(len(hh))
+            if len(hh)>0:
+
+                cluster=np.array(hh[9:])
+                cluster=cluster.reshape(int(cluster.shape[0]/3),3)
+                # print(cluster)
+                # print("==")
+
+                hit.append(int(hh[1]))
+
+                for h in hh:
+                    # print("A" + h + "B")
+                    hit.append(float(h))
+                # print(hit)
+                # print(hh)
+            if len(hh)>=12:
+                cluster=np.array(hit[10:])
+                cluster=cluster.reshape(int(cluster.shape[0]/3),3)
+                # print(cluster)
+                hits.append(actsHit(cluster,hit[0],hit[1],hit[6],hit[7],hit[8]))
+
+    print("Close - HITS 2")
+
     cleanHits = []
-
     for hit in hits:
         hit.setDet(sqrt(hit.gx**2 + hit.gy**2))
         if hit.Det==0 or hit.Det==1:
@@ -706,12 +521,74 @@ def csvActsLoad(filen,path,maximum=-1):
 
     return makeDoublets(cleanHits)
 
+    # historxy=[]
+    # historzy=[]
+    # x=[]
+    # y=[]
+    # z=[]
+    #
+    # trackdict = {}
+    #
+    # for hit in hits:
+    # #for j in range(1,2000):
+    #
+    #     # nopixels = (len(hit) - 9 ) / 3
+    #     # #print(nopixels)
+    #     # #print(hit)
+    #     # # print(nopixels)
+    #     # #cluster=hit[9:]
+    #     #
+    #     historxy.append(sqrt(hit.gx**2 + hit.gy**2))
+    #     historzy.append(sqrt(hit.gy**2 + hit.gz**2))
+    #     trackdict[hit.trackId()] = 0
+    #     x.append(hit.gx)
+    #     y.append(hit.gy)
+    #     z.append(hit.gz)
+    #     # print("Cluster " + str(r))
+    #     # print(hit[:9])
+    #     # print(cluster)
+    #
+    #     #prendere gli ultimi parametri
+    #     #fare il centro
+    #     #riempire l'istogramma
+    #
+    # for hit in hits:
+    # #for j in range(1,2000):
+    #
+    #     # nopixels = (len(hit) - 9 ) / 3
+    #     trackdict[hit.trackId()] += 1
+    #
+    # print(trackdict[max(trackdict, key=trackdict.get)])
+    # print(max(trackdict, key=trackdict.get))
+    #
+    # # return
+    # # plt.hist2d(x, y, bins=40, norm=LogNorm())
+    #
+    # figxy, axxy = plt.subplots(figsize=(8, 4.5))
+    # figzy, axzy = plt.subplots(figsize=(8, 4.5))
+    # figy, axy = plt.subplots(figsize=(8, 4.5))
+    # figx, axx = plt.subplots(figsize=(8, 4.5))
+    # figz, axz = plt.subplots(figsize=(8, 4.5))
+    #
+    # fig3d = plt.figure()
+    # a3d = fig3d.add_subplot(111, projection='3d')
+    #
+    # n, bins, patches = axxy.hist(historxy, 1000, facecolor='green', alpha=0.75)
+    # n, bins, patches = axzy.hist(historzy, 1000, facecolor='blue', alpha=0.75)
+    # n, bins, patches = axx.hist(x, 1000, facecolor='red', alpha=0.75)
+    # n, bins, patches = axy.hist(y, 1000, facecolor='yellow', alpha=0.75)
+    # n, bins, patches = axz.hist(z, 1000, facecolor='brown', alpha=0.75)
+    #
+    # # a3d.scatter(x, y, z)
+    #
+    # plt.show()
+
 def datasetload(filesList,path,delimit='\t',fileslimit =-1,writetohd = False,type="",filterstats = False,flip="-1"):
 
     # datafiles = np.array([f for f in listdir(path) if (isfile(join(path, f)) and  f.lower().endswith(('.txt',".gz")))])
     datafiles = filesList
 
-    if fileslimit < 1:
+    if fileslimit == 0:
         fileslimit = 1
 
     if len(filesList) > fileslimit > 0:
@@ -728,16 +605,14 @@ def datasetload(filesList,path,delimit='\t',fileslimit =-1,writetohd = False,typ
             with open(path + filename, 'rb') as f:
                 print ("Reading clusters from txt no."+ str(no+1) +" :",f.name)
                 f.seek(0)
-                # data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
-                data = np.loadtxt(f,delimiter=delimit,dtype = np.float32)
+                data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
                 datasets.append(data)
 
         if filename.lower().endswith('.gz'):
             with gzip.open(path + filename, 'rb') as f:
                 print ("Reading clusters from zip no."+ str(no+1) +" :",f.name)
                 f.seek(0)
-                # data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
-                data = np.loadtxt(f,delimiter=delimit,dtype = np.float32)
+                data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
                 datasets.append(data)
 
     data = np.vstack(datasets)
@@ -1177,7 +1052,7 @@ def barrelMap(alldata,cols=8,rows=8,dropEdge=False,dropBad=False,dropBig=False,d
     alldata = alldata[alldata[:,datadict["isBarrelOut"]]==float(True)]
     print(" - " + str(nclusts-alldata.shape[0]) + " dropped.")
 
-    mapTH  = TH2F("clusterAtlas","clusterAtlas",130,-65,65,50,-25,25)
+    mapTH   = TH2F("clusterAtlas","clusterAtlas",130,-65,65,50,-25,25)
 
     mapclusts = []
     for data in alldata:
