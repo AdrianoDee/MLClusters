@@ -14,7 +14,6 @@ filesinput = []
 
 colors = ["b","g","r","c","m","k","#7FFFD4","#FFA500","#800080","#A52A2A","#ADD8E6","#808000"]
 
-
 path = './outputs/'
 
 filesinput.append(np.array([f for f in listdir('./outputs/') if (isfile(join(path, f)) and  f.lower().endswith(('_acc.txt')))]))
@@ -86,43 +85,33 @@ for thisfile in allFiles:
 
     with open(path + thisfile[8], 'rb') as f:
         names=f.readlines()
-        print("File : " + path + thisfile[8])
-        print(names[5])
-
-    filts.append(names[5])
-
-    label = "cnn_"
-
-    if "True" in names[1]:
-        if "True" in names[2]:
-            label += str(cnnCounter) + "_bw_a"
-        if "False" in names[2]:
-            label += str(cnnCounter) + "_bw"
-    if "False" in names[1]:
-        if "True" in names[2]:
-            label += str(cnnCounter) + "_a\t"
-        if "False" in names[2]:
-            label += str(cnnCounter) + "\t"
+        print("File cnn " + str(cnnCounter) + ": " + path + thisfile[8])
+        if(len(names)>8):
+            filts.append(names[8])
+            print(names[8])
+        else:
+            print("No filter")
+            filts.append("No filter")
 
 
-    times = names[4].split()
 
-    Label = "cnn_"
+    label = "cnn"
 
     if "True" in names[1]:
-        if "True" in names[2]:
-            Label += str(cnnCounter) + "_bw_a"
-        if "False" in names[2]:
-            Label += str(cnnCounter) + "_bw"
-    if "False" in names[1]:
-        if "True" in names[2]:
-            Label += str(cnnCounter) + "_a"
-        if "False" in names[2]:
-            Label += str(cnnCounter)
+        label += str(cnnCounter) + "_bw"
+    if "True" in names[2]:
+        label += str(cnnCounter) + "_ph"
+    if "True" in names[3]:
+        label += str(cnnCounter) + "_th"
+    if "0" in names[4]:
+        label += str(cnnCounter) + "_f0"
+    if " 1" in names[4]:
+        label += str(cnnCounter) + "_f1"
+
+    times = names[7].split()
 
     accs.append(datas[0])
     vacs.append(datas[1])
-
 
     loss.append(datas[2])
     vlos.append(datas[3])
@@ -162,12 +151,12 @@ for thisfile in allFiles:
     labtime = [times,label,datas[0].shape[0],rejhalf,rejthre,rejnine,rejninn]
     timings.append(labtime)
 
-    axroc.plot(fprtest, tprtest, label=' %s ROC (area = %0.6f)' % (Label,auc(fprtest, tprtest)),color=colors[cnnCounter-1])
+    axroc.plot(fprtest, tprtest, label=' %s ROC (area = %0.6f)' % (label,auc(fprtest, tprtest)),color=colors[cnnCounter-1])
 
-    axacc.plot(datas[0], label='%s loss ' % (Label),color=colors[cnnCounter-1],lw=2)
-    axacc.plot(datas[1], label='%s val_loss ' % (Label),ls='-.',color=colors[cnnCounter-1],lw=1)
-    axloss.plot(datas[2], label='%s acc ' % (Label),color=colors[cnnCounter-1],lw=2)
-    axloss.plot(datas[3], label='%s val_acc ' % (Label),ls='-.',color=colors[cnnCounter-1],lw=1)
+    axacc.plot(datas[0], label='%s loss ' % (label),color=colors[cnnCounter-1],lw=2)
+    axacc.plot(datas[1], label='%s val_loss ' % (label),ls='-.',color=colors[cnnCounter-1],lw=1)
+    axloss.plot(datas[2], label='%s acc ' % (label),color=colors[cnnCounter-1],lw=2)
+    axloss.plot(datas[3], label='%s val_acc ' % (label),ls='-.',color=colors[cnnCounter-1],lw=1)
 
     cnnCounter += 1
 
@@ -187,13 +176,26 @@ for thisfile in allFiles:
 # tprs = fprs.reshape(fprs.shape[0],1)
 # tfpr = fprs.reshape(fprs.shape[0],1)
 # ttpr = fprs.reshape(fprs.shape[0],1)
-print ("CNN \t\t\ttraining(s) \tinf[" + str(labtrain_score.shape[0]) + "](s) \tinf[" + str(labtest_score.shape[0]) + "](s) \tepochs")
+
+headers = ["CNN","training(s)","inf[" + str(labtrain_score.shape[0]) + "](s)","inf[" + str(labtest_score.shape[0]) + "](s)","epochs"]
+heder_line = "%-20s  %-15s  %-15s %-15s %-10s" % (headers[0], headers[1], headers[2],headers[3],headers[4])
+
+print (heder_line)
+print ("%-60s" % ("====================================================================================="))
 for t in timings:
     times = t[0]
     label = t[1]
-    print (label + "\t\t " + times[0] + "\t" + times[1] + "\t" + times[2] + "\t" + str(t[2]))
 
-print ("CNN eff. @ rej\t\t0.5 \t0.75 \t0.9 \t0.99 ")
+    tvalues_line = "%-20s  %-15s  %-15s %-15s %-10s" % (label,times[0],times[1],times[2],str(t[2]))
+    print (tvalues_line)
+    print ("%-60s" % ("-------------------------------------------------------------------------------------"))
+
+print("\n")
+
+headers = ["CNN eff. @ rej","0.5","0.75","0.9","0.99"]
+heder_line = "%-20s  %-15s  %-15s %-15s %-15s" % (headers[0], headers[1], headers[2],headers[3],headers[4])
+print (heder_line)
+print ("%-60s" % ("====================================================================================="))
 for t in timings:
     label = t[1]
     rejhalf = t[3]
@@ -201,13 +203,20 @@ for t in timings:
     rejnine = t[5]
     rejninn = t[6]
 
-    print (label + "\t\t" + str(rejhalf)[:4] + "\t" + str(rejthre)[:4] + "\t" + str(rejnine)[:4] + "\t" + str(rejninn)[:4])
+    evalues_line = "%-20s  %-15s  %-15s %-15s %-15s" % (label,str(rejhalf)[:4],str(rejthre)[:4],str(rejnine)[:4],str(rejninn)[:4])
+    print(evalues_line)
+    print ("%-60s" % ("-------------------------------------------------------------------------------------"))
+
+print("\n")
 
 cnnCounter = 1
 for f in filts:
     print("================ CNN " + str(cnnCounter))
     cnnCounter += 1
     print(f)
+
+print("\n")
+
 # allROCs = np.concatenate((fprs,tprs,tfpr,ttpr),axis=1)
 axroc.legend(loc="lower right")
 axloss.legend(loc="upper right")
