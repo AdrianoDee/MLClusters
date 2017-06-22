@@ -1,8 +1,0 @@
-Filters with data 1380 shape 1 batchsize : 100
- - BW 	False
- - Phi 	False
- - Theta 	False
- - Flip 	-1
-Timings : 
-3.13979291916 0.239265203476 0.210322856903 
-ladderIn : [80.0] - isBarrelIn : [1.0] - detCounterIn : [0.0] - ladderOut : [176.0] - layerOut : [0.0] - detCounterOut : [1.0] - isBarrelOut : [1.0] - layerIn : [0.0] - 
