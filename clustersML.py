@@ -153,7 +153,7 @@ if __name__ == "__main__":
     {"isBarrelIn":[0.],"isBarrelOut":[0.]},
     cu.datamodule(data)]
 
-    filt = filters[min(fnum,len(filters)]
+    filt = filters[min(fnum,len(filters))]
 
     # {"isBarrelIn":[0.],"isBarrelOut":[0.]},
     # {"isBarrelIn":[1.],"isBarrelOut":[1.]},
@@ -257,7 +257,9 @@ if __name__ == "__main__":
 
     # plot_model(clustercnn, to_file='clustercnn.png')
 
-    early = EarlyStopping(monitor='loss', patience=20, verbose=1, mode='auto')
+    # early = EarlyStopping(monitor='loss', patience=20, verbose=1, mode='auto')
+    early = EarlyStoppingAvg(monitor='loss', patience=5, verbose=1, mode='auto',avgsteps=5)
+
     start = time.time()
     history = clustercnn.fit(data_train, label_train,validation_split=0.33, nb_epoch=epochs, batch_size=batchsize,shuffle=True,callbacks=[early])
     end = time.time()
