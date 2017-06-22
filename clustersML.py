@@ -20,6 +20,8 @@ from keras.layers import Dense, Dropout, Activation, Convolution2D, Convolution3
 from keras.callbacks import History
 from keras.utils import plot_model
 
+from avgcallbacks import EarlyStoppingAvg
+
 import time
 
 from os import listdir
@@ -70,7 +72,7 @@ if __name__ == "__main__":
     batchsize=100
     fileL = 100
 
-    filesPath = "/eos/cms/store/cmst3/group/dehep/convPixels/TTBar_NOPU/"
+    filesPath = "datasets/"
 
     splitting = 0.3
 
@@ -138,8 +140,13 @@ if __name__ == "__main__":
 
     allFiles = np.array([f for f in listdir(filesPath) if (isfile(join(filesPath, f)) and  f.lower().endswith(('.txt',".gz")))])
     trainSize = allFiles.shape[0] - int(float(allFiles.shape[0])*splitting)
+
     idx = np.random.permutation(allFiles.shape[0])
     training_idx, test_idx = idx[:trainSize], idx[trainSize:]
+
+    if int(float(allFiles.shape[0])*splitting) < 1:
+        test_idx = training_idx
+
     trainFiles,testFiles = allFiles[training_idx], allFiles[test_idx]
 
     data     = cu.datasetload(filesList=trainFiles,path=filesPath,fileslimit=fileL-int(float(fileL)*splitting))
@@ -153,7 +160,7 @@ if __name__ == "__main__":
     {"isBarrelIn":[0.],"isBarrelOut":[0.]},
     cu.datamodule(data)]
 
-    filt = filters[min(fnum,len(filters)]
+    filt = filters[min(fnum,len(filters))]
 
     # {"isBarrelIn":[0.],"isBarrelOut":[0.]},
     # {"isBarrelIn":[1.],"isBarrelOut":[1.]},
@@ -257,7 +264,9 @@ if __name__ == "__main__":
 
     # plot_model(clustercnn, to_file='clustercnn.png')
 
-    early = EarlyStopping(monitor='loss', patience=20, verbose=1, mode='auto')
+    #early = EarlyStopping(monitor='loss', patience=20, verbose=1, mode='auto')
+    early = EarlyStoppingAvg(monitor='loss', patience=1, verbose=1,avgsteps=5,mode='auto')
+
     start = time.time()
     history = clustercnn.fit(data_train, label_train,validation_split=0.33, nb_epoch=epochs, batch_size=batchsize,shuffle=True,callbacks=[early])
     end = time.time()

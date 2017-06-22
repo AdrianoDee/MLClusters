@@ -14,7 +14,7 @@ rootflag = True
 
 try:
     imp.find_module('ROOT')
-    from ROOT import *
+    #from ROOT import *
 except ImportError:
     print("No ROOT")
     rootflag = False
@@ -25,9 +25,9 @@ from math import cos,sin,sqrt
 
 from time import gmtime, strftime
 
-import matplotlib.mlab as mlab
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+# import matplotlib.mlab as mlab
+# import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
 
 np.set_printoptions(threshold=np.nan)
 
