@@ -27,7 +27,7 @@
 using namespace GeomDetEnumerators;
 using namespace std;
 
-static doubsProduction = true;
+static bool doubsProduction = true;
 // static std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>>  hitPairCache;
 // typedef std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>>::iterator hitPairCacheIterator;
 
@@ -148,7 +148,7 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
           // int dataSize = 24;
           // std::vector<float> zeros(dataSize,0.0);
 
-          if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0)
+          if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0 && doubsProduction)
           {
 
             float inX, inY, inZ, outX, outY, outZ;
