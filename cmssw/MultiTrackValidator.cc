@@ -1283,7 +1283,7 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
 
         clust.insert(clust.end(),infos.begin(),infos.end());
         hitPairInfosTot[it->first] = clust;
-*/
+
         //	for(int j = 1;j<(int)infos.size()-1;j++)
         //		fDataset<<infos[j]<< "\t";
 
@@ -1291,7 +1291,7 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
         //	fDataset<<std::endl<<std::endl;
         //std::cout<<"Hit pair done"<<std::endl;
 
-      }
+      }*/
 
       // std::cout<<buff[i]<<std::endl;
 
