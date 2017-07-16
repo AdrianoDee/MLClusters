@@ -122,16 +122,16 @@ if __name__ == "__main__":
 #   6 - Barrel Ladders couple
 #   7 - detIn 4 detOut 5
 #   8 - inZ OutZ : [-5.0,5.0]
-    
-   
-    bathsizes = [1000,data.shape[0]/10,100]
+
+
+    bathsizes = [1000,int(data.shape[0]/10),100]
     BandW = False
-    
+
     print(data.shape)
     for batchsize in bathsizes:
         for angC in [True]:
             for sanrt in [0.5,0.25]:
-   		for filt in filters:
+                for filt in filters:
 
                    # opt = raw_input('Insert filter(s)? ')
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
                     clustercnn.summary()
          	    #clustercnn.save(fileOuttxt + "_model.h5")
-		    #clustercnn.save_weights(fileOuttxt + "_weights.h5") 
+		    #clustercnn.save_weights(fileOuttxt + "_weights.h5")
                     # print(label_train)
                     # print(predicted_target)
                     #

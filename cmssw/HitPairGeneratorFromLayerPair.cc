@@ -27,13 +27,14 @@
 using namespace GeomDetEnumerators;
 using namespace std;
 
+static doubsProduction = true;
+// static std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>>  hitPairCache;
+// typedef std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>>::iterator hitPairCacheIterator;
 
-static std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>>  hitPairCache;
-typedef std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>>::iterator hitPairCacheIterator;
 
 int detOnArr[10] = {0,1,2,3,14,15,16,29,30,31};
 std::vector<int> detOn(detOnArr,detOnArr+sizeof(detOnArr)/sizeof(int));
-std::map<std::pair <int,std::pair<float,float> >, int> cacheMap;
+// std::map<std::pair <int,std::pair<float,float> >, int> cacheMap;
 
 typedef PixelRecoRange<float> Range;
 
@@ -122,20 +123,30 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
           int eveNumber = iEvent.id().event();
           int runNumber = iEvent.id().run();
           int lumNumber = iEvent.id().luminosityBlock();
+
+          int detSeqIn = innerLayer.detLayer()->seqNum();
+          int detSeqOut = outerLayer.detLayer()->seqNum();
+
           float padHalfSize = 4.0;
 
           std::vector<int>::iterator detOnItOne = find(detOn.begin(),detOn.end(),innerLayer.detLayer()->seqNum());
           std::vector<int>::iterator detOnItTwo = find(detOn.begin(),detOn.end(),outerLayer.detLayer()->seqNum());
 
           // std::cout<<"clusters"<<innerLayer.name()<<" "<<outerLayer.name()<<std::endl;
-          std::pair<float,float> runEvt(runNumber,eveNumber);
-          std::pair<float,float> detPair(innerLayer.detLayer()->seqNum(),outerLayer.detLayer()->seqNum());
-          std::pair<int,std::pair<float,float> > evDetPair(eveNumber,detPair);
-          std::pair< std::pair<float,float> ,std::pair<float,float> > evtRunDets(runEvt,detPair);
+          // std::pair<float,float> runEvt(runNumber,eveNumber);
+          // std::pair<float,float> detPair(innerLayer.detLayer()->seqNum(),outerLayer.detLayer()->seqNum());
+          // std::pair<int,std::pair<float,float> > evDetPair(eveNumber,detPair);
+          // std::pair< std::pair<float,float> ,std::pair<float,float> > evtRunDets(runEvt,detPair);
 
-          std::map< std::pair<int,std::pair<float,float> >  ,int>::iterator itDets = cacheMap.find(evDetPair);
+          // std::map< std::pair<int,std::pair<float,float> >  ,int>::iterator itDets = cacheMap.find(evDetPair);
 
           // if(itDets!=cacheMap.end()) std::cout<<"Pair Det In : "<<innerLayer.detLayer()->seqNum()<<" Det Out: "<<outerLayer.detLayer()->seqNum()<<" already done. Skipping"<<std::endl;
+
+          std::string fileName = "./DataFiles/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doublets.txt";
+          std::ofstream fDoublets(fileName, std::ofstream::app);
+
+          // int dataSize = 24;
+          // std::vector<float> zeros(dataSize,0.0);
 
           if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0)
           {
@@ -154,10 +165,9 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
             // std::string fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doublets.txt";
             // std::ofstream fDoublets(fileName, std::ofstream::out);
 
-
             for (size_t i = 0; i < result.size(); i++) {
 
-              cacheMap[evDetPair] = 1;
+              // cacheMap[evDetPair] = 1;
 
               int inId = result.innerHitId(i);
               int outId = result.outerHitId(i);
@@ -188,12 +198,12 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               inZ = (innerHit->hit()->globalState()).position.z();
               outZ = (outerHit->hit()->globalState()).position.z();
 
-              std::pair< float, float > xyIn((float)inX,(float)inY);
-              std::pair< float, float > xyOut((float)outX,(float)outY);
-              std::pair< float, std::pair< float, float > > zxyIn((float)inZ,xyIn);
-              std::pair< float, std::pair< float, float > > zxyOut((float)outZ,xyOut);
-              std::pair< std::pair< float, std::pair< float, float > >, std::pair< float, std::pair< float, float > > > xyzInOut (zxyIn,zxyOut);
-              std::pair< std::pair< std::pair<float,float> ,std::pair<float,float> > ,std::pair< std::pair< float, std::pair< float, float > >, std::pair< float, std::pair< float, float > > >> hitsID(evtRunDets,xyzInOut);
+              // std::pair< float, float > xyIn((float)inX,(float)inY);
+              // std::pair< float, float > xyOut((float)outX,(float)outY);
+              // std::pair< float, std::pair< float, float > > zxyIn((float)inZ,xyIn);
+              // std::pair< float, std::pair< float, float > > zxyOut((float)outZ,xyOut);
+              // std::pair< std::pair< float, std::pair< float, float > >, std::pair< float, std::pair< float, float > > > xyzInOut (zxyIn,zxyOut);
+              // std::pair< std::pair< std::pair<float,float> ,std::pair<float,float> > ,std::pair< std::pair< float, std::pair< float, float > >, std::pair< float, std::pair< float, float > > >> hitsID(evtRunDets,xyzInOut);
               DetId outerDetId = outerHit->hit()->geographicalId();
               DetId innerDetId = innerHit->hit()->geographicalId();
 
@@ -291,6 +301,20 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               //    	std::ofstream fClustersMap(fileName, std::ofstream::out);
               std::vector<float> clustVec;
 
+              clustVec.push_back(runNumber); //0
+              clustVec.push_back(eveNumber); //1
+
+              clustVec.push_back(detSeqIn); //2
+              clustVec.push_back(detSeqOut); //3
+
+              clustVec.push_back((float)(floor(inZ*1000.))/1000.); //4
+              clustVec.push_back((float)(floor(inX*1000.))/1000.);
+              clustVec.push_back((float)(floor(inY*1000.))/1000.);
+
+              clustVec.push_back((float)(floor(outZ*1000.))/1000.); //7
+              clustVec.push_back((float)(floor(outX*1000.))/1000.);
+              clustVec.push_back((float)(floor(outY*1000.))/1000.);
+
               clustVec.push_back(detCounterIn);
               clustVec.push_back(detCounterOut);
               clustVec.push_back(isBarrelIn);
@@ -326,15 +350,26 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               for (int ny = 0; ny < outerCluster->GetNbinsY(); ++ny)
               clustVec.push_back(outerCluster->GetBinContent(nx,ny));
 
-              hitPairCache[hitsID] = clustVec;
+              for (size_t i = 0; i < clustVec.size(); ++i)
+                fDoublets << clustVec[i] << "\t";
+
+              fDoublets << -5421369.3478427;
+
+              // for (int i = 0; i < dataSize - 1; ++i)
+              //   fDoublets << infos[i] << "\t";
+              //
+              // fDoublets << infos[dataSize-1];
+
+              fDoublets << std::endl;//<< std::endl;
+
+              clustVec.clear();
+
 
             }
           }
 
-          std::string fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doubletmap.txt";
-          std::ofstream fClustersMap(fileName, std::ofstream::out);
           // std::cout<<"Map size : "<<hitPairCache.size()<<std::endl;
-
+/*
           for (hitPairCacheIterator it=hitPairCache.begin(); it!=hitPairCache.end(); ++it)
           {
 
@@ -342,9 +377,13 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
 
             // //		std::cout<<"HERE!"<<std::endl;
             fClustersMap << it->first.first.first.first << "\t" << it->first.first.first.second<< "\t";
+            //hitsID.evtRunDets.runEvt.runNumber \t hitsID.evtRunDets.runEvt.eveNumber
             fClustersMap << it->first.first.second.first << "\t" << it->first.first.second.second<< "\t" ;
+            //hitsID.evtRunDets.detPair.innerSeq \t hitsID.evtRunDets.detPair.outerSeq
             fClustersMap << it->first.second.first.first << "\t" << it->first.second.first.second.first << "\t" << it->first.second.first.second.second<< "\t";
+            //hitsID.xyzInOut.zxyIn.inZ \t hitsID.xyzInOut.zxyIn.xyIn.inX \t hitsID.xyzInOut.zxyIn.xyIn.inY \t
             fClustersMap << it->first.second.second.first << "\t" << it->first.second.second.second.first << "\t" << it->first.second.second.second.second<< "\t";
+            //hitsID.xyzInOut.zxyOut.outZ \t hitsID.xyzInOut.zxyOut.xyOut.outX \t hitsID.xyzInOut.zxyOut.xyOut.outY \t
             // //
             // // fDoublets << it->first.first.first.first << "\t" << it->first.first.first.second<< "\t";
             // // fDoublets << it->first.first.second.first << "\t" << it->first.first.second.second<< "\t";
@@ -397,11 +436,12 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
 
 
 
-
+          */
           //	std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >
           //	<< it->first->first->first->first
-          fClustersMap.clear();
-          fClustersMap.close();
+
+          fDoublets.clear();
+          fDoublets.close();
 
 
 

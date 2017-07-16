@@ -43,26 +43,28 @@
 using namespace std;
 using namespace edm;
 
+// 
+// void split(const std::string &s, char delim, std::vector<std::string> &elems) {
+//   std::stringstream ss;
+//   ss.str(s);
+//   std::string item;
+//   while (std::getline(ss, item, delim)) {
+//     elems.push_back(item);
+//   }
+// }
 
-void split(const std::string &s, char delim, std::vector<std::string> &elems) {
-  std::stringstream ss;
-  ss.str(s);
-  std::string item;
-  while (std::getline(ss, item, delim)) {
-    elems.push_back(item);
-  }
-}
-
-typedef std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>> HitPairInfos;
-typedef HitPairInfos::iterator HitPairInfosIt;
-static HitPairInfos hitPairInfosTot;
-
-typedef std::map< std::pair < float, std::pair <float ,float> > , std::vector<float>> HitInfos;
-typedef HitInfos::iterator HitInfosIt;
-static HitInfos hitInfos;
+// typedef std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>> HitPairInfos;
+// typedef HitPairInfos::iterator HitPairInfosIt;
+// static HitPairInfos hitPairInfosTot;
+//
+// typedef std::map< std::pair < float, std::pair <float ,float> > , std::vector<float>> HitInfos;
+// typedef HitInfos::iterator HitInfosIt;
+// static HitInfos hitInfos;
 
 
-std::vector<std::string> labels = {"detCounterIn","detCounterOut","isBarrelIn","isBarrelOut","layerIn","ladderIn","moduleIn","sideIn","diskIn","panelIn","bladeIn","layerOut","ladderOut","moduleOut","sideOut","diskOut","panelOut","bladeOut","inId","outId","inX","inY","inZ","outX","outY","outZ","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut","inPix1","inPix2","inPix3","inPix4","inPix5","inPix6","inPix7","inPix8","inPix9","inPix10","inPix11","inPix12","inPix13","inPix14","inPix15","inPix16","inPix17","inPix18","inPix19","inPix20","inPix21","inPix22","inPix23","inPix24","inPix25","inPix26","inPix27","inPix28","inPix29","inPix30","inPix31","inPix32","inPix33","inPix34","inPix35","inPix36","inPix37","inPix38","inPix39","inPix40","inPix41","inPix42","inPix43","inPix44","inPix45","inPix46","inPix47","inPix48","inPix49","inPix50","inPix51","inPix52","inPix53","inPix54","inPix55","inPix56","inPix57","inPix58","inPix59","inPix60","inPix61","inPix62","inPix63","inPix64","outPix2","outPix3","outPix4","outPix5","outPix6","outPix7","outPix8","outPix9","outPix10","outPix11","outPix12","outPix13","outPix14","outPix15","outPix16","outPix17","outPix18","outPix19","outPix20","outPix21","outPix22","outPix23","outPix24","outPix25","outPix26","outPix27","outPix28","outPix29","outPix30","outPix31","outPix32","outPix33","outPix34","outPix35","outPix36","outPix37","outPix38","outPix39","outPix40","outPix41","outPix42","outPix43","outPix44","outPix45","outPix46","outPix47","outPix48","outPix49","outPix50","outPix51","outPix52","outPix53","outPix54","outPix55","outPix56","outPix57","outPix58","outPix59","outPix60","outPix61","outPix62","outPix63","outPix64","evtNum"};
+// std::vector<std::string> labels = {"detCounterIn","detCounterOut","isBarrelIn","isBarrelOut","layerIn","ladderIn","moduleIn","sideIn","diskIn","panelIn","bladeIn","layerOut","ladderOut","moduleOut","sideOut","diskOut","panelOut","bladeOut","inId","outId","inX","inY","inZ","outX","outY","outZ","isBigIn","isEdgIn","isBadIn","isBigOut","isEdgOut","isBadOut","inPix1","inPix2","inPix3","inPix4","inPix5","inPix6","inPix7","inPix8","inPix9","inPix10","inPix11","inPix12","inPix13","inPix14","inPix15","inPix16","inPix17","inPix18","inPix19","inPix20","inPix21","inPix22","inPix23","inPix24","inPix25","inPix26","inPix27","inPix28","inPix29","inPix30","inPix31","inPix32","inPix33","inPix34","inPix35","inPix36","inPix37","inPix38","inPix39","inPix40","inPix41","inPix42","inPix43","inPix44","inPix45","inPix46","inPix47","inPix48","inPix49","inPix50","inPix51","inPix52","inPix53","inPix54","inPix55","inPix56","inPix57","inPix58","inPix59","inPix60","inPix61","inPix62","inPix63","inPix64","outPix2"
+
+// ,"outPix3","outPix4","outPix5","outPix6","outPix7","outPix8","outPix9","outPix10","outPix11","outPix12","outPix13","outPix14","outPix15","outPix16","outPix17","outPix18","outPix19","outPix20","outPix21","outPix22","outPix23","outPix24","outPix25","outPix26","outPix27","outPix28","outPix29","outPix30","outPix31","outPix32","outPix33","outPix34","outPix35","outPix36","outPix37","outPix38","outPix39","outPix40","outPix41","outPix42","outPix43","outPix44","outPix45","outPix46","outPix47","outPix48","outPix49","outPix50","outPix51","outPix52","outPix53","outPix54","outPix55","outPix56","outPix57","outPix58","outPix59","outPix60","outPix61","outPix62","outPix63","outPix64","evtNum"};
 
 typedef edm::Ref<edm::HepMCProduct, HepMC::GenParticle > GenParticleRef;
 namespace {
@@ -601,21 +603,22 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
         //get collections from the event
         //
 
-        std::string fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doubletmap.txt";
-        //std::cout<<fileName<<std::endl;
-        ifstream fDoublets(fileName);
+        // std::string fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doublets.txt";
+        // //std::cout<<fileName<<std::endl;
+        // ifstream fDoublets(fileName);
         // std::cout<<fDoublets.good()<<std::endl;
         // fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doublets.txt";
         // ifstream fLabels(fileName);
 
 
 
-        HitPairInfos hitPairInfo;
-        int key = 0;
+        // HitPairInfos hitPairInfo;
+        // int key = 0;
 
-        std::string line;
+        // std::string line;
         //std::cout<<"Input doublets"<<std::endl;
-        while(fDoublets.good() && std::getline(fDoublets,line)) //&& fDoublets >> run >> evt >> detIn >> detOut >> inZ >> inX >> inY >> outZ >> outX >> outY)
+
+        /*while(fDoublets.good() && std::getline(fDoublets,line)) //&& fDoublets >> run >> evt >> detIn >> detOut >> inZ >> inX >> inY >> outZ >> outX >> outY)
         {
           // float run,evt;
           // float detIn,detOut,inX,inY,inZ,outX,outY,outZ;
@@ -663,10 +666,10 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
 
           //		for(int k =0; k<(int)inputVec.size();++k)
           //			std::cout<<inputVec[k]<<std::endl;
-        }
+        }*/
 
-        fDoublets.clear();
-        fDoublets.seekg(0, ios::beg);
+        // fDoublets.clear();
+        // fDoublets.seekg(0, ios::beg);
 
         edm::Handle<View<Track> >  trackCollectionHandle;
         if(!event.getByToken(labelToken[www], trackCollectionHandle)&&ignoremissingtkcollection_)continue;
@@ -961,6 +964,10 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
 
 
           int dataSize = 24;
+          std::vector<float> zeros(dataSize,0.0);
+
+          std::string fileName = "./DataFiles/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doubletsmatch.txt";
+          ofstream fMatched(fileName,std::ofstream::app);
 
           for(View<Track>::size_type i=0; i<trackCollection.size(); ++i){
 
@@ -985,6 +992,7 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
 
             auto tpFound = recSimColl.find(track);
             isSimMatched = tpFound != recSimColl.end();
+
             if (isSimMatched) {
 
               const auto& tp = tpFound->val;
@@ -1036,68 +1044,85 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
                 sigMatch = isSigSimMatched;
               }
 
-              for ( trackingRecHit_iterator recHit = track->recHitsBegin();recHit != track->recHitsEnd(); ++recHit )
-              {
-                // std::cout<<"Here ok too!"<<std::endl;
-                if ( !((*recHit)->isValid()) ) continue;
-                // std::cout<<"Valid!"<<std::endl;
-                if( (*recHit)->geographicalId().det() != DetId::Tracker ) continue;
-                // std::cout<<"GeoId!"<<std::endl;
-                uint IntSubDetID = ((*recHit)->geographicalId().subdetId());
-                // std::cout<<"IntSubDetID!"<<std::endl;
-                if(IntSubDetID == 0 ) continue;
-                // std::cout<<"IntSubDetID 2!"<<std::endl;
-                if(IntSubDetID != PixelSubdetector::PixelBarrel && IntSubDetID != PixelSubdetector::PixelEndcap) continue;
-                //std::cout<<"IntSubDetID 3!"<<std::endl;
-                if(!((*recHit)->hasPositionAndError())) continue;
-                float oX = ((*recHit)->globalPosition()).x();
-                float oY = ((*recHit)->globalPosition()).y();
-                float oZ = ((*recHit)->globalPosition()).z();
-                //std::cout<<"OX !"<<std::endl;
-                //std::cout<<oX<<" "<<oY<<" "<<oZ<<std::endl;
-                // std::cout<<"OX 3!"<<std::endl;
-                std::pair <float ,float> xy((float)(floor(oX*1000.))/1000.,(float)(floor(oY*1000.))/1000.);
-                std::pair < float, std::pair <float ,float> > xyz((float)(floor(oZ*1000.))/1000.,xy);
+              if(doubsProduction)
+                {
 
-                std::vector<float> trackParameters;
+                  for ( trackingRecHit_iterator recHit = track->recHitsBegin();recHit != track->recHitsEnd(); ++recHit )
+                  {
+                    // std::cout<<"Here ok too!"<<std::endl;
+                    if ( !((*recHit)->isValid()) ) continue;
+                    // std::cout<<"Valid!"<<std::endl;
+                    if( (*recHit)->geographicalId().det() != DetId::Tracker ) continue;
+                    // std::cout<<"GeoId!"<<std::endl;
+                    uint IntSubDetID = ((*recHit)->geographicalId().subdetId());
+                    // std::cout<<"IntSubDetID!"<<std::endl;
+                    if(IntSubDetID == 0 ) continue;
+                    // std::cout<<"IntSubDetID 2!"<<std::endl;
+                    if(IntSubDetID != PixelSubdetector::PixelBarrel && IntSubDetID != PixelSubdetector::PixelEndcap) continue;
+                    //std::cout<<"IntSubDetID 3!"<<std::endl;
+                    if(!((*recHit)->hasPositionAndError())) continue;
+                    float oX = ((*recHit)->globalPosition()).x();
+                    float oY = ((*recHit)->globalPosition()).y();
+                    float oZ = ((*recHit)->globalPosition()).z();
+                    //std::cout<<"OX !"<<std::endl;
+                    //std::cout<<oX<<" "<<oY<<" "<<oZ<<std::endl;
+                    // std::cout<<"OX 3!"<<std::endl;
+                    // std::pair <float ,float> xy((float)(floor(oX*1000.))/1000.,(float)(floor(oY*1000.))/1000.);
+                    // std::pair < float, std::pair <float ,float> > xyz((float)(floor(oZ*1000.))/1000.,xy);
 
-                trackParameters.push_back((float) i);
-                trackParameters.push_back(px);
-                trackParameters.push_back(py);
-                trackParameters.push_back(pz);
-                trackParameters.push_back(pt);
+                    std::vector<float> trackParameters;
 
-                trackParameters.push_back(mT);
-                trackParameters.push_back(eT);
-                trackParameters.push_back(mSqr);
-                trackParameters.push_back(rapidity);
-                trackParameters.push_back(etaTrack);
-                trackParameters.push_back(phi);
+                    trackParameters.push_back((float)(floor(oZ*1000.))/1000.);
+                    trackParameters.push_back((float)(floor(oX*1000.))/1000.);
+                    trackParameters.push_back((float)(floor(oY*1000.))/1000.);
+                    trackParameters.push_back((float) i);
 
-                trackParameters.push_back(pdgId);
-                trackParameters.push_back(charge);
+                    trackParameters.push_back(px);
+                    trackParameters.push_back(py);
+                    trackParameters.push_back(pz);
+                    trackParameters.push_back(pt);
 
-                trackParameters.push_back(noTrackerHits);
-                trackParameters.push_back(noTrackerLayers);
+                    trackParameters.push_back(mT);
+                    trackParameters.push_back(eT);
+                    trackParameters.push_back(mSqr);
+                    trackParameters.push_back(rapidity);
+                    trackParameters.push_back(etaTrack);
+                    trackParameters.push_back(phi);
 
-                trackParameters.push_back(dZ);
-                trackParameters.push_back(dXY);
+                    trackParameters.push_back(pdgId);
+                    trackParameters.push_back(charge);
 
-                trackParameters.push_back(Xvertex);
-                trackParameters.push_back(Yvertex);
-                trackParameters.push_back(Zvertex);
+                    trackParameters.push_back(noTrackerHits);
+                    trackParameters.push_back(noTrackerLayers);
 
-                trackParameters.push_back((float)bunCross);
-                trackParameters.push_back((float)isCosmic);
-                trackParameters.push_back((float)chargeMatch);
-                trackParameters.push_back((float)sigMatch);
+                    trackParameters.push_back(dZ);
+                    trackParameters.push_back(dXY);
 
-                hitInfos[xyz] = trackParameters;
-                trackParameters.clear();
+                    trackParameters.push_back(Xvertex);
+                    trackParameters.push_back(Yvertex);
+                    trackParameters.push_back(Zvertex);
 
-              }
+                    trackParameters.push_back((float)bunCross);
+                    trackParameters.push_back((float)isCosmic);
+                    trackParameters.push_back((float)chargeMatch);
+                    trackParameters.push_back((float)sigMatch);
+
+                    int trkSize = trackParameters.size();
+                    for (int i = 0; i < trkSize - 1; ++i)
+                      fMatched << trackParameters[i] << "\t";
+
+                    fMatched << trackParameters[trkSize-1];
+                    fMatched << std::endl;
+
+                    // hitInfos[xyz] = trackParameters;
+                    trackParameters.clear();
 
 
+                  }
+
+                  fMatched.clear();
+                  fMatched.close();
+                }
 
               LogTrace("TrackValidator") << "reco::Track #" << rT << " with pt=" << track->pt()
               << " associated with quality:" << tp.begin()->second <<"\n";
@@ -1211,9 +1236,11 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
       }*/
 
 
-      std::vector<float> zeros(dataSize,0.0);
+      // std::vector<float> zeros(dataSize,0.0);
 
       //std::cout<< "Start Mapping Hit Pairs "<<hitPairInfo.size()<<std::endl;
+
+/*
       for(HitPairInfosIt it = hitPairInfo.begin(); it!=hitPairInfo.end(); ++it)
       {
         // std::cout<<"hitPairInfo size = "<<hitPairInfo.size()<<std::endl;
@@ -1255,7 +1282,7 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
 
         clust.insert(clust.end(),infos.begin(),infos.end());
         hitPairInfosTot[it->first] = clust;
-
+*/
         //	for(int j = 1;j<(int)infos.size()-1;j++)
         //		fDataset<<infos[j]<< "\t";
 
@@ -1289,23 +1316,25 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
     } // End of  for (unsigned int www=0;www<label.size();www++){
     } //END of for (unsigned int ww=0;ww<associators.size();ww++){
 
-      std::string fileName = "./RootFiles/Datasets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_dataset.txt";
-      ofstream fDataset(fileName,std::ofstream::out);
-
-      //  std::cout<<"hitPairInfosTot size = "<<hitPairInfosTot.size()<<std::endl;
-      int in = 0;
-      for(HitPairInfosIt it = hitPairInfosTot.begin(); it!=hitPairInfosTot.end(); ++it)
-      {
-        //std::cout<<"IN! "<<in++<<std::endl;
-        std::vector<float> infos;
-        infos = it->second;
-        int infosize = (int)infos.size();
-        for(int j = 0;j<infosize-1;++j)
-        fDataset<<infos[j]<<"\t";
-
-        fDataset<<infos[infosize-1];
-        fDataset<<std::endl;
-      }
+      // std::string fileName = "./RootFiles/Datasets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_dataset.txt";
+      // ofstream f(fileName,std::ofstream::out);
+      // std::string fileName = "./RootFiles/Datasets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_datasetzero.txt";
+      // ofstream fMatched(fileName,std::ofstream::out);
+      //
+      // //  std::cout<<"hitPairInfosTot size = "<<hitPairInfosTot.size()<<std::endl;
+      // int in = 0;
+      // for(HitPairInfosIt it = hitPairInfosTot.begin(); it!=hitPairInfosTot.end(); ++it)
+      // {
+      //   //std::cout<<"IN! "<<in++<<std::endl;
+      //   std::vector<float> infos;
+      //   infos = it->second;
+      //   int infosize = (int)infos.size();
+      //   for(int j = 0;j<infosize-1;++j)
+      //   fDataset<<infos[j]<<"\t";
+      //
+      //   fDataset<<infos[infosize-1];
+      //   fDataset<<std::endl;
+      // }
 
       // HitPairInfosIt itBegin = hitPairInfosTot.begin();
       // std::vector<float> buff;

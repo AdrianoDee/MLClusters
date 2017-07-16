@@ -608,8 +608,6 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
         // fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doublets.txt";
         // ifstream fLabels(fileName);
 
-
-
         HitPairInfos hitPairInfo;
         int key = 0;
 
@@ -617,12 +615,27 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
         //std::cout<<"Input doublets"<<std::endl;
         while(fDoublets.good() && std::getline(fDoublets,line)) //&& fDoublets >> run >> evt >> detIn >> detOut >> inZ >> inX >> inY >> outZ >> outX >> outY)
         {
-          // float run,evt;
-          // float detIn,detOut,inX,inY,inZ,outX,outY,outZ;
-          //
+          trackParameters.push_back((float)(floor(oZ*1000.))/1000.);
+          trackParameters.push_back((float)(floor(oX*1000.))/1000.);
+          trackParameters.push_back((float)(floor(oY*1000.))/1000.);
+          trackParameters.push_back((float) i);
+
+          trackParameters.push_back(px);
+          trackParameters.push_back(py);
+          trackParameters.push_back(pz);
+          trackParameters.push_back(pt);
+
+          trackParameters.push_back(mT);
+          trackParameters.push_back(eT);
+          trackParameters.push_back(mSqr);
+          trackParameters.push_back(rapidity);
+          trackParameters.push_back(etaTrack);
+          trackParameters.push_back(phi);
+
+          trackParameters.push_back(pdgId);
+
           std::vector<float> inputVec;
           std::vector<std::string > tokens;
-          // std::cout<<"KEY : "<<++key<<" "<<line<<std::endl;
 
           split(line,'\t',tokens);
 
