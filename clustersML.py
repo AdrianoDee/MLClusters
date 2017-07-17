@@ -289,6 +289,9 @@ if __name__ == "__main__":
                         for k, v in filt.iteritems():
                             u += str(k) + " : " + str(v) + " - "
                         u += "\n" + filespath + "\n"
+                        u += "\n" + fileL + "\n"
+                        u += "\n" + sanrt + "\n"
+
                         filtfile.write(u)
 
                 #     result = (batchsize,filters,predicted_target,label_train,predicted_target_test,label_test,history,data_train.shape)
