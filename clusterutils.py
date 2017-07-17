@@ -288,17 +288,17 @@ def datasetload(path='./datasets/',delimit='\t',fileslimit =-1,writetohd = False
     print("Loading " + str(len(datafiles)) + " dataset file(s) . . .")
 
     datasets  = []
-    for filename in datafiles:
+    for no,filename in enumerate(datafiles):
         if filename.lower().endswith('.txt'):
             with open(path + filename, 'rb') as f:
-                print ("Reading clusters from txt :",f.name)
+                print ("Reading clusters from txt :"+ str(no+1) +" :",f.name)
                 f.seek(0)
                 data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
                 datasets.append(data)
 
         if filename.lower().endswith('.gz'):
             with gzip.open(path + filename, 'rb') as f:
-                print ("Reading clusters from zip :",f.name)
+                print ("Reading clusters from zip :"+ str(no+1) +" :",f.name)
                 f.seek(0)
                 data = np.genfromtxt(f,delimiter=delimit,dtype = np.float32)
                 datasets.append(data)
