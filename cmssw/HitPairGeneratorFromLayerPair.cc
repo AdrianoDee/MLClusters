@@ -148,7 +148,7 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
           // int dataSize = 24;
           // std::vector<float> zeros(dataSize,0.0);
 
-          if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0 && doubsProduction)
+          if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0 && )
           {
 
             float inX, inY, inZ, outX, outY, outZ;
@@ -156,6 +156,7 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
             int layerOut = 0, ladderOut = 0, moduleOut = 0, sideOut = 0, diskOut = 0, panelOut = 0, bladeOut = 0;
             int detCounterIn = -1, detCounterOut = -1;
             bool isBigIn = false, isEdgIn = false,isBigOut = false, isEdgOut = false,isBadIn = false,isBadOut = false,isBarrelIn = false,isBarrelOut = false;
+            bool isFlippedIn = false, isFlippedOut = false;
 
             TH2F *innerCluster = 0, *outerCluster = 0;
 
@@ -207,6 +208,18 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               DetId outerDetId = outerHit->hit()->geographicalId();
               DetId innerDetId = innerHit->hit()->geographicalId();
 
+              const GeomDet* outerDet = outerHit->det();
+              const GeomDet* innerDet = innerHit->det();
+
+              float tmp1 = innerDet->surface().toGlobal(Local3DPoint(0.,0.,0.)).perp();
+              float tmp2 = innerDet->surface().toGlobal(Local3DPoint(0.,0.,1.)).perp();
+
+              if(tmp2<tmp1) isFlippedIn = true;
+
+              tmp1 = outerDet->surface().toGlobal(Local3DPoint(0.,0.,0.)).perp();
+              tmp2 = outerDet->surface().toGlobal(Local3DPoint(0.,0.,1.)).perp();
+
+              if(tmp2<tmp1) isFlippedOut = true;
 
               unsigned int subidIn=innerDetId.subdetId();
               unsigned int subidOut=outerDetId.subdetId();
@@ -341,6 +354,8 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               clustVec.push_back(isBigOut);
               clustVec.push_back(isEdgOut);
               clustVec.push_back(isBadOut);
+              clustVec.push_back(isFlippedIn);
+              clustVec.push_back(isFlippedOut);
 
               for (int nx = 0; nx < innerCluster->GetNbinsX(); ++nx)
               for (int ny = 0; ny < innerCluster->GetNbinsY(); ++ny)
