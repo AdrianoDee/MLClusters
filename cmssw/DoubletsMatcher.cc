@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <sys/times.h>
 #include <sys/time.h>
 #include <fstream>
@@ -9,6 +8,7 @@
 #include <math.h>
 #include <sstream>
 #include <algorithm>
+#include <map>
 
 int detOnArr[10] = {0,1,2,3,14,15,16,29,30,31};
 std::vector<int> detOn(detOnArr,detOnArr+sizeof(detOnArr)/sizeof(int));
@@ -39,29 +39,29 @@ void debug(int line) {
 int main(int argc, char** argv)
 {
 
-  for (int i = 1; i < argc; ++i)
-	{
-		std::string arg = argv[i];
-
     int lum = 1;
     int run = 1;
     int evt = 1;
 
 
-    if (arg == "-e")
-		{
-			if (i + 1 < argc) // Make sure we aren't at the end of argv!
-			{
-				i++;
-				std::istringstream ss(argv[i]);
-				if (!(ss >> evt))
-				{
-					std::cerr << "Invalid number " << argv[i] << '\n';
-					exit(1);
 
-				}
-			}
-		}
+  for (int i = 1; i < argc; ++i)
+        {
+                std::string arg = argv[i];
+    if (arg == "-e")
+                {
+                        if (i + 1 < argc) // Make sure we aren't at the end of argv!
+                        {
+                                i++;
+                                std::istringstream ss(argv[i]);
+                                if (!(ss >> evt))
+                                {
+                                        std::cerr << "Invalid number " << argv[i] << '\n';
+                                        exit(1);
+
+                                }
+                        }
+                }
 
     if (arg == "-r")
     {
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 
 
     std::pair<float,float> xy(atof(tokens[1].data()),atof(tokens[2].data()));
-    std::pair < float, std::pair <float ,float> zxy(atof(tokens[0].data()),xy)
+    std::pair < float, std::pair <float ,float> > zxy(atof(tokens[0].data()),xy);
 
     hitInfo[zxy] = infoVec;
     infoVec.clear();
@@ -146,11 +146,11 @@ int main(int argc, char** argv)
   }
 
   fMatched.clear();
-  fMatched.seekg(0, ios::beg);
+//  fMatched.seekg(0, ios::beg);
   fMatched.close();
 
 
-  std::string fileName = std::to_string(lum) +"_"+std::to_string(run) +"_"+std::to_string(evt) + "_doublets.txt";
+  fileName = std::to_string(lum) +"_"+std::to_string(run) +"_"+std::to_string(evt) + "_doublets.txt";
   std::ifstream fDoublets(fileName, std::ofstream::app);
 
   while(fDoublets.good() && std::getline(fDoublets,line))
@@ -169,13 +169,13 @@ int main(int argc, char** argv)
     std::pair < float, std::pair <float ,float> > ixyz(iZ,ixy);
 
     float oZ = doubVec[7], oX = doubVec[8], oY = doubVec[9];
-    std::pair <float ,float> ixy(oX,oY);
+    std::pair <float ,float> oxy(oX,oY);
     std::pair < float, std::pair <float ,float> > oxyz(oZ,oxy);
 
     HitInfosIt itHitIn = hitInfo.find(ixyz);
     HitInfosIt itHitOut = hitInfo.find(oxyz);
 
-    if(itHitIn!=hitInfos.end() && itHitOut!=hitInfos.end())
+    if(itHitIn!=hitInfo.end() && itHitOut!=hitInfo.end())
     {
       if((itHitIn->second)[0]==(itHitOut->second)[0])
         doubInf = itHitIn->second;
@@ -183,9 +183,9 @@ int main(int argc, char** argv)
     else
       doubInf = zeros;
 
-    if((int)doubInf.size()!=dataSize) std::cout<<"WARNINCAZZO: "<<infos.size()<<" "<<dataSize<<std::endl;
+    if((int)doubInf.size()!=dataSize) std::cout<<"WARNINCAZZO: "<<doubInf.size()<<" "<<dataSize<<std::endl;
 
-    doubVec.insert(clust.end(),doubInf.begin(),doubInf.end());
+    doubVec.insert(doubVec.end(),doubInf.begin(),doubInf.end());
 
     doublets.push_back(doubVec);
 
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
   }
 
   fileName = std::to_string(lum) +"_"+std::to_string(run) +"_"+std::to_string(evt) + "_dataset.txt";
-  std::ifstream fDataset(fileName);
+  std::ofstream fDataset(fileName);
 
   for (size_t i = 0; i < doublets.size(); i++) {
 
