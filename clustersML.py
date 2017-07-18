@@ -160,26 +160,26 @@ if __name__ == "__main__":
                     else:
                         inSh = (8, 16,1)
 
-                    clustercnn.add(Convolution2D(128, (2, 2), input_shape=inSh, activation='relu', padding='same'))
+                    clustercnn.add(Convolution2D(32, (2, 2), input_shape=inSh, activation='relu', padding='same'))
                     clustercnn.add(Dropout(0.2))
-                    clustercnn.add(Convolution2D(64, (2, 2), activation='relu', padding='same'))
+                    clustercnn.add(Convolution2D(32, (2, 2), activation='relu', padding='same'))
                     s = 1
                     if angC:
                         s = 2
                     clustercnn.add(MaxPooling2D(pool_size=(s, 2)))
-                    clustercnn.add(Convolution2D(128, (2, 2), activation='relu', padding='same'))
+                    clustercnn.add(Convolution2D(64, (2, 2), activation='relu', padding='same'))
                     clustercnn.add(Dropout(0.2))
-                    clustercnn.add(Convolution2D(128, (2, 2), activation='relu', padding='same'))
+                    clustercnn.add(Convolution2D(64, (2, 2), activation='relu', padding='same'))
                     clustercnn.add(MaxPooling2D(pool_size=(1, 2)))
-                    clustercnn.add(Convolution2D(256, (2, 2), activation='relu', padding='same'))
+                    clustercnn.add(Convolution2D(128, (2, 2), activation='relu', padding='same'))
                     clustercnn.add(Dropout(0.2))
                     # clustercnn.add(Convolution2D(128, (2, 2), activation='relu', padding='same'))
                     # clustercnn.add(MaxPooling2D(pool_size=(2, 2)))
                     clustercnn.add(Flatten())
                     clustercnn.add(Dropout(0.2))
-                    clustercnn.add(Dense(256, activation='relu', kernel_constraint=maxnorm(3)))
+                    clustercnn.add(Dense(64, activation='relu', kernel_constraint=maxnorm(3)))
                     clustercnn.add(Dropout(0.2))
-                    clustercnn.add(Dense(128, activation='relu', kernel_constraint=maxnorm(3)))
+                    clustercnn.add(Dense(32, activation='relu', kernel_constraint=maxnorm(3)))
                     clustercnn.add(Dropout(0.2))
                     clustercnn.add(Dense(2, activation='softmax'))
 
