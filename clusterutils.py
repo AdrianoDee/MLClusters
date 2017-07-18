@@ -634,9 +634,9 @@ sanratio=0.5,writesample=False,samplesize=-1.0,writedata=False):
         # sys.exit()
 
     if angularcorrection:
-        cltdata=cltdata.reshape(nclusts,3,rows,2*cols)#,1)
+        cltdata=cltdata.reshape(nclusts,rows,2*cols,3)#,1)
     else:
-        cltdata=cltdata.reshape(nclusts,1,rows,2*cols)
+        cltdata=cltdata.reshape(nclusts,rows,2*cols,1)
 
     # print(cltdata.shape)
     # print(cltdata[0][0])

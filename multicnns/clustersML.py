@@ -443,6 +443,7 @@ def runComplete(fileL=100,filesPath="./datasets/"):
                             else:
                                 inSh = (1, 8, 16)
 
+                            clustercnn.add()
                             clustercnn.add(Convolution2D(64, (2, 2), input_shape=inSh, activation='relu', padding='same'))
                             clustercnn.add(Dropout(0.2))
                             clustercnn.add(Convolution2D(64, (2, 2), activation='relu', padding='same'))

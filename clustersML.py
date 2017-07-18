@@ -21,6 +21,10 @@ from keras.callbacks import History
 
 import time
 
+from keras import backend as K
+from keras.engine.topology import Layer
+import numpy as np
+
 sklearnflag = True
 
 try:
@@ -152,9 +156,9 @@ if __name__ == "__main__":
                     inSh = ()
 
                     if angC:
-                        inSh = (3, 8, 16)
+                        inSh = (8, 16,3)
                     else:
-                        inSh = (1, 8, 16)
+                        inSh = (8, 16,1)
 
                     clustercnn.add(Convolution2D(128, (2, 2), input_shape=inSh, activation='relu', padding='same'))
                     clustercnn.add(Dropout(0.2))
@@ -178,6 +182,8 @@ if __name__ == "__main__":
                     clustercnn.add(Dense(128, activation='relu', kernel_constraint=maxnorm(3)))
                     clustercnn.add(Dropout(0.2))
                     clustercnn.add(Dense(2, activation='softmax'))
+
+                    clustercnn.summary()
 
                     lrate = 0.01
                     decay = 10.0 * lrate/epochs
@@ -321,6 +327,7 @@ def runCNN(data,datatest,filters,batchsize,epochs=2000,san=True,one=False,ang=Tr
     else:
         inSh = (1, 8, 16)
 
+    clustercnn.add()
     clustercnn.add(Convolution2D(64, (2, 2), input_shape=inSh, activation='relu', padding='same'))
     clustercnn.add(Dropout(0.2))
     clustercnn.add(Convolution2D(64, (2, 2), activation='relu', padding='same'))
