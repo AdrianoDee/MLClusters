@@ -295,8 +295,8 @@ if __name__ == "__main__":
                         for k, v in filt.iteritems():
                             u += str(k) + " : " + str(v) + " - "
                         u += "\n" + filespath + "\n"
-                        u += "\n" + fileL + "\n"
-                        u += "\n" + sanrt + "\n"
+                        u += "\n" + str(fileL) + "\n"
+                        u += "\n" + str(sanrt) + "\n"
 
                         filtfile.write(u)
 
