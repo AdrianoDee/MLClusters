@@ -64,9 +64,6 @@ if __name__ == "__main__":
     batchsize=100
     fileL = 100
 
-    filenames = np.array([f for f in listdir(path) if (isfile(join(path, f)) and  f.lower().endswith(('.txt',".gz")))])
-
-
     print("Starting Clusters CNN Training with: ")
 
     for i in range(1,len(sys.argv)):
@@ -105,14 +102,6 @@ if __name__ == "__main__":
     data     = cu.datasetload(fileslimit=fileL,path=filespath)
     filetest = filespath + "/test/"
     datatest = cu.datasetload(fileslimit=35,path=filetest)
-
-    #create outputs dirs
-    if not os.path.exists("outputs"):
-        os.makedirs("outputs")
-
-
-    outputsdir = "./outputs/" +
-
     print(data.shape[0])
     # results = []
 
