@@ -28,6 +28,12 @@
 #include "CommonTools/Utils/interface/associationMapFilterValues.h"
 #include<type_traits>
 #include <unordered_set>
+
+#include "DataFormats/DetId/interface/DetId.h"
+#include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
+#include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
+#include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
+
 //#include "RecoTracker/TkHitPairs/interface/HitPairGeneratorFromLayerPair.h"
 
 #include "TMath.h"
@@ -44,6 +50,7 @@ using namespace std;
 using namespace edm;
 
 static bool doubsProduction = true;
+
 //
 // void split(const std::string &s, char delim, std::vector<std::string> &elems) {
 //   std::stringstream ss;
@@ -970,11 +977,14 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
           std::string fileName = "./DataFiles/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doubletsmatch.txt";
           ofstream fMatched(fileName,std::ofstream::app);
 
+          std::cout<<"Track_col size : " << trackCollection.size();
+
           for(View<Track>::size_type i=0; i<trackCollection.size(); ++i){
 
             int pdgId, noTrackerHits, noTrackerLayers,bunCross;
 
             float px = 0.0 ,py = 0.0 ,pz = 0.0 ,pt = 0.0, charge = 0.0;
+            int layer = 0, ladder = 0, module = 0, side = 0, disk = 0, panel = 0, blade = 0, hitC = 0;
             float mT, eT, phi, rapidity, mSqr;
             bool isCosmic = false , chargeMatch = false, sigMatch = false;
 
@@ -995,6 +1005,8 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
             isSimMatched = tpFound != recSimColl.end();
 
             if (isSimMatched) {
+
+              std::cout<<" - Track : " << i << std::endl;
 
               const auto& tp = tpFound->val;
               nSimHits = tp[0].first->numberOfTrackerHits();
@@ -1047,24 +1059,69 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
 
               if(doubsProduction)
                 {
-
+                  hitC = 0;
                   for ( trackingRecHit_iterator recHit = track->recHitsBegin();recHit != track->recHitsEnd(); ++recHit )
                   {
+                    PXBDetId pbdetId(0);
+                    PXFDetId pfdetId(0);
+
+                    ++hitC;
                     // std::cout<<"Here ok too!"<<std::endl;
                     if ( !((*recHit)->isValid()) ) continue;
                     // std::cout<<"Valid!"<<std::endl;
                     if( (*recHit)->geographicalId().det() != DetId::Tracker ) continue;
                     // std::cout<<"GeoId!"<<std::endl;
-                    uint IntSubDetID = ((*recHit)->geographicalId().subdetId());
+                    DetId detID = (*recHit)->geographicalId();
+                    uint IntSubDetID = (detID.subdetId());
                     // std::cout<<"IntSubDetID!"<<std::endl;
-                    if(IntSubDetID == 0 ) continue;
+                    // if(IntSubDetID == 0 ) continue;
                     // std::cout<<"IntSubDetID 2!"<<std::endl;
                     if(IntSubDetID != PixelSubdetector::PixelBarrel && IntSubDetID != PixelSubdetector::PixelEndcap) continue;
                     //std::cout<<"IntSubDetID 3!"<<std::endl;
+
+                    if(IntSubDetID==1)
+                    {
+                      pbdetId = PXBDetId(detID);
+
+                      layer  = pbdetId.layer();
+                      ladder = pbdetId.ladder();
+                      module = pbdetId.module();
+                    }
+                    if(IntSubDetID==2)
+                    {
+
+                      pfdetId = PXFDetId(detID);
+
+                      side = pfdetId.side();
+                      disk = pfdetId.disk();
+                      blade = pfdetId.blade();
+                      panel = pfdetId.panel();
+                      module = pfdetId.module();
+
+                    }
+
                     if(!((*recHit)->hasPositionAndError())) continue;
                     float oX = ((*recHit)->globalPosition()).x();
                     float oY = ((*recHit)->globalPosition()).y();
                     float oZ = ((*recHit)->globalPosition()).z();
+
+                    float clustX = 0.0, clustY = 0.0;
+                    float clusterADC = 0.0, zeroADC = 0.0 , spanX = 0.0, spanY = 0.0, cSize = 0.0;
+
+                    const SiPixelRecHit* siHit = dynamic_cast<const SiPixelRecHit*>((*recHit));
+                    SiPixelRecHit::ClusterRef const& cluster = siHit->cluster();
+
+                    clustX = cluster->x();
+                    clustY = cluster->y();
+
+                    clusterADC = cluster->charge();
+
+                    zeroADC = cluster->pixel(0).adc;
+
+                    spanX = cluster->sizeX();
+                    spanY = cluster->sizeY();
+                    cSize = cluster->size();
+
                     //std::cout<<"OX !"<<std::endl;
                     //std::cout<<oX<<" "<<oY<<" "<<oZ<<std::endl;
                     // std::cout<<"OX 3!"<<std::endl;
@@ -1072,43 +1129,63 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
                     // std::pair < float, std::pair <float ,float> > xyz((float)(floor(oZ*1000.))/1000.,xy);
 
                     std::vector<float> trackParameters;
+                    std::cout<<" = =  Hit no. ("<<i<<"):" << hitC << " - " << oX << " - " << oY << " - " << oZ << " - " << clustX << " - " << clustY << std::endl;
+                    //HIT INFOs
+                    trackParameters.push_back(oZ);//(float)(floor(oZ*1000.))/1000.); //0
+                    trackParameters.push_back(oX);//(float)(floor(oX*1000.))/1000.); //1
+                    trackParameters.push_back(oY);//(float)(floor(oY*1000.))/1000.);
+                    trackParameters.push_back((float) hitC); //3
 
-                    trackParameters.push_back((float)(floor(oZ*1000.))/1000.);
-                    trackParameters.push_back((float)(floor(oX*1000.))/1000.);
-                    trackParameters.push_back((float)(floor(oY*1000.))/1000.);
-                    trackParameters.push_back((float) i);
+                    trackParameters.push_back((float) layer); //4
+                    trackParameters.push_back((float) ladder);
+                    trackParameters.push_back((float) module);
+                    trackParameters.push_back((float) side);
+                    trackParameters.push_back((float) disk);
+                    trackParameters.push_back((float) panel);
+                    trackParameters.push_back((float) blade); //10
 
+                    trackParameters.push_back(clustX); //11
+                    trackParameters.push_back(clustY);
+                    trackParameters.push_back(clusterADC);
+                    trackParameters.push_back(zeroADC);
+                    trackParameters.push_back(spanX);
+                    trackParameters.push_back(spanY);
+                    trackParameters.push_back(cSize);//17
+
+                    //TRACK INFOs
+                    trackParameters.push_back((float) i);//18
                     trackParameters.push_back(px);
                     trackParameters.push_back(py);
                     trackParameters.push_back(pz);
                     trackParameters.push_back(pt);
 
-                    trackParameters.push_back(mT);
+                    trackParameters.push_back(mT);//23
                     trackParameters.push_back(eT);
                     trackParameters.push_back(mSqr);
                     trackParameters.push_back(rapidity);
                     trackParameters.push_back(etaTrack);
-                    trackParameters.push_back(phi);
+                    trackParameters.push_back(phi);//28
 
-                    trackParameters.push_back(pdgId);
+                    trackParameters.push_back(pdgId);//29
                     trackParameters.push_back(charge);
 
-                    trackParameters.push_back(noTrackerHits);
+                    trackParameters.push_back(noTrackerHits);//31
                     trackParameters.push_back(noTrackerLayers);
 
-                    trackParameters.push_back(dZ);
+                    trackParameters.push_back(dZ);//33
                     trackParameters.push_back(dXY);
 
-                    trackParameters.push_back(Xvertex);
+                    trackParameters.push_back(Xvertex);//35
                     trackParameters.push_back(Yvertex);
                     trackParameters.push_back(Zvertex);
 
-                    trackParameters.push_back((float)bunCross);
+                    trackParameters.push_back((float)bunCross);//38
                     trackParameters.push_back((float)isCosmic);
                     trackParameters.push_back((float)chargeMatch);
                     trackParameters.push_back((float)sigMatch);
 
                     int trkSize = trackParameters.size();
+
                     for (int i = 0; i < trkSize - 1; ++i)
                       fMatched << trackParameters[i] << "\t";
 
@@ -1121,8 +1198,8 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
 
                   }
 
-                  fMatched.clear();
-                  fMatched.close();
+                  // fMatched.clear();
+
                 }
 
               LogTrace("TrackValidator") << "reco::Track #" << rT << " with pt=" << track->pt()
@@ -1209,7 +1286,11 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
           //std::vector<PSimHit> simhits=tpr.get()->trackPSimHit(DetId::Tracker);
           //nrecHit_vs_nsimHit_rec2sim[w]->Fill(track->numberOfValidHits(), (int)(simhits.end()-simhits.begin() ));
 
-        } // End of for(View<Track>::size_type i=0; i<trackCollection.size(); ++i){
+        }
+        fMatched.clear();
+        fMatched.close();
+        std::cout<<std::endl;
+          // End of for(View<Track>::size_type i=0; i<trackCollection.size(); ++i){
           /*
           std::cout<<"Befor hit map"<<std::endl;
           for(HitInfosIt it = hitInfos.begin(); it!=hitInfos.end(); ++it)
