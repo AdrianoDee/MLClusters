@@ -1034,6 +1034,7 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
               noTrackerLayers = tpar.numberOfTrackerLayers();
 
               dXY = (-verTp.x()*sin(momTp.phi())+verTp.y()*cos(momTp.phi()));
+              dZ = verTp.z() - (verTp.x()*momTp.x()+verTp.y()*momTp.y())/sqrt(momTp.perp2());
 
               Zvertex = verTp.z();
               Xvertex = verTp.x();
@@ -1187,9 +1188,9 @@ simPVMaxZ_(pset.getUntrackedParameter<double>("simPVMaxZ"))
                     int trkSize = trackParameters.size();
 
                     for (int i = 0; i < trkSize - 1; ++i)
-                      fMatched << trackParameters[i] << "\t";
+                      fMatched << float(trackParameters[i]) << "\t";
 
-                    fMatched << trackParameters[trkSize-1];
+                    fMatched << float(trackParameters[trkSize-1]);
                     fMatched << std::endl;
 
                     // hitInfos[xyz] = trackParameters;

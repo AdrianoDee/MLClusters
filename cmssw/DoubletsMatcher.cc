@@ -318,9 +318,9 @@ int main(int argc, char** argv)
     int vecsize = doubVec.size();
     //std::cout<< vecsize <<std::endl;
     for(int j = 0;j<vecsize - 1;++j)
-      fDataset << doubVec[j]<<"\t";
+      fDataset << float(doubVec[j])<<"\t";
 
-    fDataset << doubVec[vecsize - 1];
+    fDataset << float(doubVec[vecsize - 1]);
 
     fDataset << std::endl;
     doubInf.clear();

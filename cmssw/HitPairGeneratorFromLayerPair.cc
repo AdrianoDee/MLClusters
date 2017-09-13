@@ -18,6 +18,7 @@
 #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
 #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
+#include "Geometry/CommonDetUnit/interface/GeomDetEnumerators.h"
 
 #include <iostream>
 #include <string>
@@ -132,8 +133,8 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
           float padHalfSize = 7.5;
           int padSize = (int)(padHalfSize*2);
 
-          std::vector<int>::iterator detOnItOne = find(detOn.begin(),detOn.end(),innerLayer.detLayer()->seqNum());
-          std::vector<int>::iterator detOnItTwo = find(detOn.begin(),detOn.end(),outerLayer.detLayer()->seqNum());
+          // std::vector<int>::iterator detOnItOne = find(detOn.begin(),detOn.end(),innerLayer.detLayer()->seqNum());
+          // std::vector<int>::iterator detOnItTwo = find(detOn.begin(),detOn.end(),outerLayer.detLayer()->seqNum());
 
           // std::cout<<"clusters"<<innerLayer.name()<<" "<<outerLayer.name()<<std::endl;
           // std::pair<float,float> runEvt(runNumber,eveNumber);
@@ -151,8 +152,11 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
           // int dataSize = 24;
           // std::vector<float> zeros(dataSize,0.0);
 
-          if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0)
+          // if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0)
+          if(GeomDetEnumerators::isTrackerPixel(innerLayer.detLayer()->subDetector()) && GeomDetEnumerators::isTrackerPixel(outerLayer.detLayer()->subDetector()))
           {
+            std::cout << innerLayer.detLayer()->subDetector() << std::endl;
+            std::cout << outerLayer.detLayer()->subDetector() << std::endl;
 
             float inX, inY, inZ, outX, outY, outZ, inPhi, outPhi, inR, outR;
             int layerIn = 0, ladderIn = 0, moduleIn = 0, sideIn = 0, diskIn = 0, panelIn = 0, bladeIn = 0;
@@ -168,8 +172,8 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
 
             TH2F *innerCluster = 0, *outerCluster = 0;
 
-            detCounterIn= (Int_t)(detOnItOne - detOn.begin());
-            detCounterOut = (Int_t)(detOnItTwo - detOn.begin());
+            detCounterIn= (Int_t)(detSeqIn);
+            detCounterOut = (Int_t)(detSeqOut);
 
             // std::string fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doublets.txt";
             // std::ofstream fDoublets(fileName, std::ofstream::out);
@@ -480,7 +484,7 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               //clustVec.push_back(outerCluster->GetBinContent(nx,ny));
 
               for (size_t i = 0; i < clustVec.size(); ++i)
-                fDoublets << clustVec[i] << "\t";
+                fDoublets << float(clustVec[i]) << "\t";
 
               fDoublets << -5421369.3478427;
 
