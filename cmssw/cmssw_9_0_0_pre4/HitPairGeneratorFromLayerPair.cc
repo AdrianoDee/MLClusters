@@ -1,3 +1,4 @@
+#include "TCanvas.h"
 #include "RecoTracker/TkHitPairs/interface/HitPairGeneratorFromLayerPair.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
@@ -17,6 +18,7 @@
 #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
 #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
+#include "Geometry/CommonDetUnit/interface/GeomDetEnumerators.h"
 
 #include <iostream>
 #include <string>
@@ -28,10 +30,10 @@ using namespace GeomDetEnumerators;
 using namespace std;
 
 static bool doubsProduction = true;
+//static int doubCounter = 0;
 // static std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>>  hitPairCache;
 // typedef std::map<std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >, std::vector<float>>::iterator hitPairCacheIterator;
-typedef std::tuple <fptype, fptype, fptype, fptype> easyId; //, fptype, fptype, fptype, fptype, fptype, fptype, fptype>
-typedef std::map<easyId,fptype> infMap;
+
 
 int detOnArr[10] = {0,1,2,3,14,15,16,29,30,31};
 std::vector<int> detOn(detOnArr,detOnArr+sizeof(detOnArr)/sizeof(int));
@@ -116,11 +118,10 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
 
         const RecHitsSortedInPhi& outerHitsMap = layerCache(outerLayer, region, iSetup);
         if (outerHitsMap.empty()) return HitDoublets(innerHitsMap,outerHitsMap);
-        HitDoublets result(innerHitsMap,outerHitsMap);
-        HitDoublets inferesult(innerHitsMap,outerHitsMap);
-        result.reserve(std::max(innerHitsMap.size(),outerHitsMap.size()));
-        inferesult.reserve(std::max(innerHitsMap.size(),outerHitsMap.size()));
-        doublets(region,*innerLayer.detLayer(),*outerLayer.detLayer(),innerHitsMap,outerHitsMap,iSetup,theMaxElement,result);
+        HitDoublets result(innerHitsMap,outerHitsMap); result.reserve(std::max(innerHitsMap.size(),outerHitsMap.size()));
+        doublets(region,
+          *innerLayer.detLayer(),*outerLayer.detLayer(),
+          innerHitsMap,outerHitsMap,iSetup,theMaxElement,result);
 
           int eveNumber = iEvent.id().event();
           int runNumber = iEvent.id().run();
@@ -129,10 +130,11 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
           int detSeqIn = innerLayer.detLayer()->seqNum();
           int detSeqOut = outerLayer.detLayer()->seqNum();
 
-          float padHalfSize = 4.0;
+          float padHalfSize = 7.5;
+          int padSize = (int)(padHalfSize*2);
 
-          std::vector<int>::iterator detOnItOne = find(detOn.begin(),detOn.end(),innerLayer.detLayer()->seqNum());
-          std::vector<int>::iterator detOnItTwo = find(detOn.begin(),detOn.end(),outerLayer.detLayer()->seqNum());
+          // std::vector<int>::iterator detOnItOne = find(detOn.begin(),detOn.end(),innerLayer.detLayer()->seqNum());
+          // std::vector<int>::iterator detOnItTwo = find(detOn.begin(),detOn.end(),outerLayer.detLayer()->seqNum());
 
           // std::cout<<"clusters"<<innerLayer.name()<<" "<<outerLayer.name()<<std::endl;
           // std::pair<float,float> runEvt(runNumber,eveNumber);
@@ -147,45 +149,31 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
           std::string fileName = "./DataFiles/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doublets.txt";
           std::ofstream fDoublets(fileName, std::ofstream::app);
 
-          fileName = "./DataFiles/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_inference.txt";
-          std::ofstream fInfered(fileName, std::ofstream::app);
-
-          bool outDoublets = false;
-          fptype inDetInf, outDetInf, inIdInf, outIdInf, inXInf, inYInf, inZInf, outXInf, outYInf, outZInf, yInf;
-          infMap thisInfMap;
-          infMap::iterator thisInfMapIt;
-          if ( fInfered.good() && !outDoublets)
-          {
-            std::cout <<"\n- Reading from inferend doublets. " << std::endl;
-          //while( (evt < events)  &&  (dataTxt >> var1 >> var2 >> var3 >> var4 >> var5) ) { // need to add a check for var5 and skip it if not present in the file
-          // inDet outDet inX inY inZ outX outY outZ y
-
-          //while( (fInfered >>inDetInf >> outDetInf >> inIdInf >> outIdInf >> inXInf, inYIn >>, inZInf >> outXInf >> outYInf >> outZInf >> yInf) )
-          while(fInfered >>inDetInf >> outDetInf >> inIdInf >> outIdInf >> yInf)
-          {
-            easyId loadId(inDetInf,outDetInf,inIdInf,outIdInf);
-            thisInfMap[easyId] = yInf;
-          }
-          }
-
           // int dataSize = 24;
           // std::vector<float> zeros(dataSize,0.0);
 
-
-          if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0 && outDoublets)
+          // if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0)
+          if(GeomDetEnumerators::isTrackerPixel(innerLayer.detLayer()->subDetector()) && GeomDetEnumerators::isTrackerPixel(outerLayer.detLayer()->subDetector()))
           {
+            std::cout << innerLayer.detLayer()->subDetector() << std::endl;
+            std::cout << outerLayer.detLayer()->subDetector() << std::endl;
 
-            float inX, inY, inZ, outX, outY, outZ;
+            float inX, inY, inZ, outX, outY, outZ, inPhi, outPhi, inR, outR;
             int layerIn = 0, ladderIn = 0, moduleIn = 0, sideIn = 0, diskIn = 0, panelIn = 0, bladeIn = 0;
             int layerOut = 0, ladderOut = 0, moduleOut = 0, sideOut = 0, diskOut = 0, panelOut = 0, bladeOut = 0;
             int detCounterIn = -1, detCounterOut = -1;
             bool isBigIn = false, isEdgIn = false,isBigOut = false, isEdgOut = false,isBadIn = false,isBadOut = false,isBarrelIn = false,isBarrelOut = false;
             bool isFlippedIn = false, isFlippedOut = false;
 
+            float inClusterADC,outClusterADC,diffADC,inClustX,inClustY,outClustX,outClustY;
+            float iCSize, oCSize, iCSizeX, oCSizeX, iCSizeY, oCSizeY, iZeroADC, oZeroADC;
+
+            bool iOverFlowX = false, oOverFlowX = false, iOverFlowY = false, oOverFlowY = false;
+
             TH2F *innerCluster = 0, *outerCluster = 0;
 
-            detCounterIn= (Int_t)(detOnItOne - detOn.begin());
-            detCounterOut = (Int_t)(detOnItTwo - detOn.begin());
+            detCounterIn= (Int_t)(detSeqIn);
+            detCounterOut = (Int_t)(detSeqOut);
 
             // std::string fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doublets.txt";
             // std::ofstream fDoublets(fileName, std::ofstream::out);
@@ -222,6 +210,12 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               outY = (outerHit->hit()->globalState()).position.y();
               inZ = (innerHit->hit()->globalState()).position.z();
               outZ = (outerHit->hit()->globalState()).position.z();
+
+              inPhi = result.phi(i, HitDoublets::inner);
+              outPhi = result.phi(i, HitDoublets::outer);
+
+              inR = result.r(i, HitDoublets::inner);
+              outR = result.r(i, HitDoublets::outer);
 
               // std::pair< float, float > xyIn((float)inX,(float)inY);
               // std::pair< float, float > xyOut((float)outX,(float)outY);
@@ -309,6 +303,29 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               SiPixelRecHit::ClusterRef const& clusterIn = siHitIn->cluster();
               SiPixelRecHit::ClusterRef const& clusterOut = siHitOut->cluster();
 
+              inClustX = clusterIn->x();
+              inClustY = clusterIn->y();
+
+              outClustX = clusterOut->x();
+              outClustY = clusterOut->y();
+
+              iCSize = clusterIn->size();
+              oCSize = clusterOut->size();
+
+              iCSizeX = clusterIn->sizeX();
+              oCSizeX = clusterOut->sizeX();
+
+              iCSizeY = clusterIn->sizeY();
+              oCSizeY = clusterOut->sizeY();
+
+              iZeroADC = clusterIn->pixel(0).adc;
+              oZeroADC = clusterOut->pixel(0).adc;
+
+              if(iCSizeX>15) iOverFlowX = true;
+              if(iCSizeY>15) iOverFlowY = true;
+              if(oCSizeX>15) oOverFlowX = true;
+              if(oCSizeY>15) oOverFlowY = true;
+
               isBigIn = siHitIn->spansTwoROCs();
               isBadIn = siHitIn->hasBadPixels();
               isEdgIn = siHitIn->isOnEdge();
@@ -317,8 +334,8 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
               isBadOut = siHitOut->hasBadPixels();
               isEdgOut = siHitOut->isOnEdge();
 
-              innerCluster = new TH2F("innerCluster->","innerCluster->",(Int_t)(padHalfSize*2),floor(clusterIn->x())-padHalfSize,floor(clusterIn->x())+padHalfSize,(Int_t)(padHalfSize*2),floor(clusterIn->y())-padHalfSize,floor(clusterIn->y())+padHalfSize);
-              outerCluster = new TH2F("hitclusterOut","hitclusterOut",(Int_t)(padHalfSize*2),floor(clusterOut->x())-padHalfSize,floor(clusterOut->x())+padHalfSize,(Int_t)(padHalfSize*2),floor(clusterOut->y())-padHalfSize,floor(clusterOut->y())+padHalfSize);
+              innerCluster = new TH2F("innerCluster->","innerCluster->",padSize,floor(inClustX)-padHalfSize,floor(inClustX)+padHalfSize,padSize,floor(inClustY)-padHalfSize,floor(inClustY)+padHalfSize);
+              outerCluster = new TH2F("hitclusterOut","hitclusterOut",padSize,floor(outClustX)-padHalfSize,floor(outClustX)+padHalfSize,padSize,floor(outClustY)-padHalfSize,floor(outClustY)+padHalfSize);
 
               // std::cout<<innerCluster->GetNbinsX()<<outerCluster->GetNbinsX()<<std::endl;
 
@@ -329,66 +346,145 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
                 outerCluster->SetBinContent(nx,ny,0.0);
               }
               for (int k = 0; k < clusterIn->size(); ++k)
-              innerCluster->SetBinContent(innerCluster->FindBin((double)clusterIn->pixel(k).x, (double)clusterIn->pixel(k).y),clusterIn->pixel(k).adc);
+                  innerCluster->SetBinContent(innerCluster->FindBin((double)clusterIn->pixel(k).x, (double)clusterIn->pixel(k).y),clusterIn->pixel(k).adc);
 
               for (int k = 0; k < clusterOut->size(); ++k)
-              outerCluster->SetBinContent(outerCluster->FindBin((double)clusterOut->pixel(k).x, (double)clusterOut->pixel(k).y),clusterOut->pixel(k).adc);
+                  outerCluster->SetBinContent(outerCluster->FindBin((double)clusterOut->pixel(k).x, (double)clusterOut->pixel(k).y),clusterOut->pixel(k).adc);
 
-              //	fileName = "./RootFiles/Doublets/" + std::to_string(lumNumber) +"_"+std::to_string(runNumber) +"_"+std::to_string(eveNumber) + "_doubletmap.txt";
-              //    	std::ofstream fClustersMap(fileName, std::ofstream::out);
+
+              //std::cout << "=================================" << std::endl;
+              //std::cout << "Cluster In " << std::endl;
+              //std::cout << " x "<< clusterIn->x()<< " - y "<< clusterIn->y() << std::endl;
+              inClusterADC = (float) clusterIn->charge();
+              outClusterADC = (float) clusterOut->charge();
+
+              diffADC = outClusterADC - inClusterADC;
+
               std::vector<float> clustVec;
-
+              // ++doubCounter;
+              //std::cout << "Doublet counter :" << doubCounter << std::endl;
               clustVec.push_back(runNumber); //0
               clustVec.push_back(eveNumber); //1
 
               clustVec.push_back(detSeqIn); //2
               clustVec.push_back(detSeqOut); //3
 
-              clustVec.push_back((float)(floor(inZ*1000.))/1000.); //4
-              clustVec.push_back((float)(floor(inX*1000.))/1000.);
-              clustVec.push_back((float)(floor(inY*1000.))/1000.);
+              clustVec.push_back(inZ); //4
+              clustVec.push_back(inX);
+              clustVec.push_back(inY);
 
-              clustVec.push_back((float)(floor(outZ*1000.))/1000.); //7
-              clustVec.push_back((float)(floor(outX*1000.))/1000.);
-              clustVec.push_back((float)(floor(outY*1000.))/1000.);
+              clustVec.push_back(outZ); //7
+              clustVec.push_back(outX);
+              clustVec.push_back(outY);//9
 
-              clustVec.push_back(detCounterIn);
+              clustVec.push_back(inPhi);//10
+              clustVec.push_back(inR);
+              clustVec.push_back(outPhi);
+              clustVec.push_back(outR);//13
+
+              clustVec.push_back(detCounterIn); //14
               clustVec.push_back(detCounterOut);
               clustVec.push_back(isBarrelIn);
               clustVec.push_back(isBarrelOut);
-              clustVec.push_back(layerIn);
+
+              clustVec.push_back(layerIn); //18
               clustVec.push_back(ladderIn);
               clustVec.push_back(moduleIn);
               clustVec.push_back(sideIn);
               clustVec.push_back(diskIn);
               clustVec.push_back(panelIn);
-              clustVec.push_back(bladeIn);
-              clustVec.push_back(layerOut);
+              clustVec.push_back(bladeIn);//24
+
+              clustVec.push_back(layerOut); //25
               clustVec.push_back(ladderOut);
               clustVec.push_back(moduleOut);
               clustVec.push_back(sideOut);
               clustVec.push_back(diskOut);
               clustVec.push_back(panelOut);
-              clustVec.push_back(bladeOut);
-              clustVec.push_back(inId);
-              clustVec.push_back(outId);
+              clustVec.push_back(bladeOut);//31
+              // clustVec.push_back(inId);
+              // clustVec.push_back(outId);
               clustVec.push_back(isBigIn);
               clustVec.push_back(isEdgIn);
-              clustVec.push_back(isBadIn);
+
+              clustVec.push_back(isBadIn);//34
               clustVec.push_back(isBigOut);
               clustVec.push_back(isEdgOut);
               clustVec.push_back(isBadOut);
+              clustVec.push_back(isFlippedIn);
+              clustVec.push_back(isFlippedOut);
 
-              for (int nx = 0; nx < innerCluster->GetNbinsX(); ++nx)
-              for (int ny = 0; ny < innerCluster->GetNbinsY(); ++ny)
-              clustVec.push_back(innerCluster->GetBinContent(nx,ny));
+              clustVec.push_back(iCSize);//40
+              clustVec.push_back(clusterIn->x());//41
+              clustVec.push_back(clusterIn->y());//42
+              clustVec.push_back(inClusterADC);//43
+              clustVec.push_back(iZeroADC);
+              clustVec.push_back(iCSize);
+              clustVec.push_back(iCSizeX);
+              clustVec.push_back(iCSizeY);
+              clustVec.push_back(iCSizeY);
+              clustVec.push_back(iOverFlowX);
+              clustVec.push_back(iOverFlowY);//50
 
-              for (int nx = 0; nx < outerCluster->GetNbinsX(); ++nx)
-              for (int ny = 0; ny < outerCluster->GetNbinsY(); ++ny)
-              clustVec.push_back(outerCluster->GetBinContent(nx,ny));
+              clustVec.push_back(oCSize);//51
+              clustVec.push_back(clusterOut->x());//52
+              clustVec.push_back(clusterOut->y());//53
+              clustVec.push_back(outClusterADC);//54
+              clustVec.push_back(oZeroADC);
+              clustVec.push_back(oCSize);
+              clustVec.push_back(oCSizeX);
+              clustVec.push_back(oCSizeY);
+              clustVec.push_back(oCSizeY);
+              clustVec.push_back(oOverFlowX);
+              clustVec.push_back(oOverFlowY);
+
+              clustVec.push_back(diffADC);//63
+
+              //for (int nx = 0; nx < innerCluster->GetNbinsX(); ++nx)
+              /*for (int ny = 1; ny <= innerCluster->GetNbinsX() * innerCluster->GetNbinsY(); ++ny)
+              {
+                clustVec.push_back(innerCluster->GetBinContent(ny));
+                std::cout<<innerCluster->GetBinContent(ny)<< std::endl;
+              //innerCluster->
+              }*/
+
+                /*for(int nx = 0;nx<=(int)(padHalfSize*2.0); nx++)
+          {
+
+              for(int ny =0;ny<=(int)(padHalfSize*2.0); ny++){
+                  int n = innerCluster->GetBin(nx,ny);
+               std::cout << "("<< nx <<";"<< ny <<"; "<< n << ")\t"; }
+              std::cout << std::endl;
+          }   */
+
+              for (int ny = padSize; ny>0; --ny)
+              {
+               for(int nx = 0; nx<padSize; nx++)
+                {
+                    int n = (ny+2)*(padSize + 2) - 2 -2 - nx - padSize;
+                    //std::cout<<" ( "<< n <<" ; "<<innerCluster->GetBinContent(n) << ")\t";//<<std::endl;
+                    clustVec.push_back(innerCluster->GetBinContent(n));
+                }
+                // std::cout << std::endl;
+               }
+
+               for (int ny = padSize; ny>0; --ny)
+              {
+               for(int nx = 0; nx<padSize; nx++)
+                {
+                    int n = (ny+2)*(padSize + 2) - 2 -2 - nx - padSize;
+                    //std::cout<<" ( "<< n <<" ; "<<innerCluster->GetBinContent(n) << ")\t";//<<std::endl;
+                    clustVec.push_back(outerCluster->GetBinContent(n));
+                }
+                // std::cout << std::endl;
+               }
+
+              //for (int nx = 0; nx < outerCluster->GetNbinsX(); ++nx)
+              //for (int ny = 0; ny < outerCluster->GetNbinsY(); ++ny)
+              //clustVec.push_back(outerCluster->GetBinContent(nx,ny));
 
               for (size_t i = 0; i < clustVec.size(); ++i)
-                fDoublets << clustVec[i] << "\t";
+                fDoublets << float(clustVec[i]) << "\t";
 
               fDoublets << -5421369.3478427;
 
@@ -405,32 +501,105 @@ HitPairGeneratorFromLayerPair::HitPairGeneratorFromLayerPair(
             }
           }
 
-          fDoublets.clear();
-          fDoublets.close();
-
-          if(detOnItOne!=detOn.end() && detOnItTwo!=detOn.end() && result.size()!=0 && !outDoublets)
+          // std::cout<<"Map size : "<<hitPairCache.size()<<std::endl;
+/*
+          for (hitPairCacheIterator it=hitPairCache.begin(); it!=hitPairCache.end(); ++it)
           {
-            detCounterIn= (Int_t)(detOnItOne - detOn.begin());
-            detCounterOut = (Int_t)(detOnItTwo - detOn.begin());
 
-            for (size_t i = 0; i < result.size(); i++) {
+            std::vector<float> theVec = it->second;
 
-              int inId = result.innerHitId(i);
-              int outId = result.outerHitId(i);
-              easyId thisIds(detCounterIn,detCounterOut,inId,outId);
+            // //		std::cout<<"HERE!"<<std::endl;
+            fClustersMap << it->first.first.first.first << "\t" << it->first.first.first.second<< "\t";
+            //hitsID.evtRunDets.runEvt.runNumber \t hitsID.evtRunDets.runEvt.eveNumber
+            fClustersMap << it->first.first.second.first << "\t" << it->first.first.second.second<< "\t" ;
+            //hitsID.evtRunDets.detPair.innerSeq \t hitsID.evtRunDets.detPair.outerSeq
+            fClustersMap << it->first.second.first.first << "\t" << it->first.second.first.second.first << "\t" << it->first.second.first.second.second<< "\t";
+            //hitsID.xyzInOut.zxyIn.inZ \t hitsID.xyzInOut.zxyIn.xyIn.inX \t hitsID.xyzInOut.zxyIn.xyIn.inY \t
+            fClustersMap << it->first.second.second.first << "\t" << it->first.second.second.second.first << "\t" << it->first.second.second.second.second<< "\t";
+            //hitsID.xyzInOut.zxyOut.outZ \t hitsID.xyzInOut.zxyOut.xyOut.outX \t hitsID.xyzInOut.zxyOut.xyOut.outY \t
+            // //
+            // // fDoublets << it->first.first.first.first << "\t" << it->first.first.first.second<< "\t";
+            // // fDoublets << it->first.first.second.first << "\t" << it->first.first.second.second<< "\t";
+            // // fDoublets << it->first.second.first.first << "\t" << it->first.second.first.second.first << "\t" << it->first.second.first.second.second<< "\t";
+            // // fDoublets << it->first.second.second.first << "\t" << it->first.second.second.second.first << "\t" << it->first.second.second.second.second<< "\t";
+            // // // fDoublets << std::endl << std::endl;
+            //
+            // fClustersMap<<detCounterIn<<"\t";
+            // fClustersMap<<detCounterOut<<"\t";
+            //
+            // fClustersMap<<isBarrelIn<<"\t";
+            // fClustersMap<<isBarrelOut<<"\t";
+            //
+            // fClustersMap<<layerIn<<"\t";
+            // fClustersMap<<ladderIn<<"\t";
+            // fClustersMap<<moduleIn<<"\t";
+            // fClustersMap<<sideIn<<"\t";
+            // fClustersMap<<diskIn<<"\t";
+            // fClustersMap<<panelIn<<"\t";
+            // fClustersMap<<bladeIn<<"\t";
+            //
+            // fClustersMap<<layerOut<<"\t";
+            // fClustersMap<<ladderOut<<"\t";
+            // fClustersMap<<moduleOut<<"\t";
+            // fClustersMap<<sideOut<<"\t";
+            // fClustersMap<<diskOut<<"\t";
+            // fClustersMap<<panelOut<<"\t";
+            // fClustersMap<<bladeOut<<"\t";
+            //
+            // fClustersMap<<inId<<"\t";
+            // fClustersMap<<outId<<"\t";
+            //
+            // fClustersMap<<isBigIn<<"\t";
+            // fClustersMap<<isEdgIn<<"\t";
+            // fClustersMap<<isBadIn<<"\t";
+            // fClustersMap<<isBigOut<<"\t";
+            // fClustersMap<<isEdgOut<<"\t";
+            // fClustersMap<<isBadOut<<"\t";
 
-              thisInfMapIt = find(thisInfMap.begin(),thisInfMap.end(),thisIds);
-
-              if(thisInfMapIt != thisInfMap.end())
-                if(*thisInfMapIt.second >= threshInference)
-                  inferesult.add(inId,outId);
+            for (size_t i = 0; i < theVec.size(); i++) {
+              fClustersMap<<theVec[i]<<"\t";
             }
+
+            //		std::cout << "CIAO" << std::endl;
+            fClustersMap << -5421369.3478427;
+            fClustersMap << std::endl;//<< std::endl;
           }
 
-    if(outDoublets)
+          // std::cout<<"Doublets : "<<hitPairCache.size()<<std::endl;
+
+
+
+          */
+          //	std::pair < std::pair < std::pair<float,float>,std::pair<float,float> >, std::pair < std::pair< float, std::pair <float ,float>> , std::pair < float, std::pair <float ,float> > > >
+          //	<< it->first->first->first->first
+
+          // fDoublets.clear();
+          fDoublets.close();
+
+
+
+
+    //      if(itDets==cacheMap.end())
+    //
+    //     else
+    //     {
+    //     auto & buffer = hitPairCache[evDetPair];
+    //     //HitDoublets buffer(&(*hitPairCache[evDetPair]));
+    //
+    //     for (std::size_t i=0; i!=result.size(); ++i) {
+    //     buffer->add(  result.innerHitId(i), result.outerHitId(i));
+    //   }
+    //   hitPairCache[evDetPair] = buffer;
+    //
+    // }
+
+
+    //  ifstream::pos_type size = sizeof(hitPairCache);
+    // ofstream save1;
+    //  save1.open("saved", ios::binary);
+
+
     return result;
-    else
-    return inferesult;
 
   }
 
